@@ -8,6 +8,10 @@ const TEMPLATES = [
   { id: 'modern', name: 'Modern', description: 'Clean design with accent colors' },
   { id: 'classic', name: 'Classic', description: 'Traditional professional format' },
   { id: 'minimal', name: 'Minimal', description: 'Simple and elegant' },
+  { id: 'executive', name: 'Executive', description: 'Formal, for senior positions' },
+  { id: 'creative', name: 'Creative', description: 'Bold design for creative roles' },
+  { id: 'technical', name: 'Technical', description: 'Optimized for engineers' },
+  { id: 'compact', name: 'Compact', description: 'Maximum content, minimal space' },
 ]
 
 const defaultResumeData = {
