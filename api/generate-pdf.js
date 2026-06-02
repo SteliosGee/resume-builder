@@ -724,6 +724,13 @@ export default async function handler(req, res) {
       b: parseInt(hex.substring(4, 6), 16),
     }
 
+    // Map user fonts to jsPDF supported fonts
+    const fontMap = {
+      'Inter': 'helvetica', 'Arial': 'helvetica', 'Helvetica': 'helvetica', 'Calibri': 'helvetica',
+      'Georgia': 'times', 'Times New Roman': 'times', 'Garamond': 'times', 'Palatino': 'times',
+    }
+    const font = fontMap[fontFamily] || 'helvetica'
+
     // Generate PDF based on template
     const pdf = new jsPDF('p', 'mm', 'a4')
     const pdfWidth = pdf.internal.pageSize.getWidth()
