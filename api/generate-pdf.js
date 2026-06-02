@@ -939,6 +939,55 @@ export default async function handler(req, res) {
       })
     }
 
+    const addProjects = (sectionFn, xOffset) => {
+      if (!resumeData.projects || resumeData.projects.length === 0 || !resumeData.projects[0].name) return
+      sectionFn('Projects')
+      const x = xOffset || 15
+      resumeData.projects.forEach((proj) => {
+        checkPage(12)
+        pdf.setFont(font, 'bold')
+        pdf.setFontSize(10)
+        pdf.text(proj.name || '', x, y)
+        if (proj.url) {
+          pdf.setFont(font, 'normal')
+          pdf.setFontSize(9)
+          pdf.setTextColor(rgb.r, rgb.g, rgb.b)
+          pdf.text(` - ${proj.url}`, x + pdf.getTextWidth(proj.name || ''), y)
+          pdf.setTextColor(0, 0, 0)
+        }
+        y += 4.5
+        if (proj.description) {
+          pdf.setFont(font, 'normal')
+          pdf.setFontSize(9)
+          pdf.setTextColor(60, 60, 60)
+          const descLines = pdf.splitTextToSize(proj.description, pdfWidth - (x === 15 ? 30 : 46))
+          pdf.text(descLines, x, y)
+          pdf.setTextColor(0, 0, 0)
+          y += descLines.length * 3.8 + 1
+        }
+        y += 2
+      })
+    }
+
+    const addCertifications = (sectionFn, xOffset) => {
+      if (!resumeData.certifications || resumeData.certifications.length === 0 || !resumeData.certifications[0].name) return
+      sectionFn('Certifications')
+      const x = xOffset || 15
+      resumeData.certifications.forEach((cert) => {
+        checkPage(8)
+        pdf.setFont(font, 'bold')
+        pdf.setFontSize(9)
+        pdf.text(cert.name || '', x, y)
+        pdf.setFont(font, 'normal')
+        pdf.setFontSize(9)
+        let extra = ''
+        if (cert.issuer) extra += ` - ${cert.issuer}`
+        if (cert.date) extra += ` (${cert.date})`
+        if (extra) pdf.text(extra, x + pdf.getTextWidth(cert.name || ''), y)
+        y += 4.5
+      })
+    }
+
     if (template === 'creative') {
       // Creative: colored sidebar
       const sidebarWidth = 55
@@ -1084,6 +1133,64 @@ export default async function handler(req, res) {
         })
       }
 
+      // Projects in main content
+      if (resumeData.projects && resumeData.projects.length > 0 && resumeData.projects[0].name) {
+        checkPage(12)
+        pdf.setFont(font, 'bold')
+        pdf.setFontSize(11)
+        pdf.setTextColor(0, 0, 0)
+        pdf.text('PROJECTS', mainX, y)
+        drawLine(mainX, y + 1.5, pdfWidth - 15, 0.3, rgb.r, rgb.g, rgb.b)
+        y += 6
+        resumeData.projects.forEach((proj) => {
+          checkPage(10)
+          pdf.setFont(font, 'bold')
+          pdf.setFontSize(9)
+          pdf.text(proj.name || '', mainX, y)
+          if (proj.url) {
+            pdf.setFont(font, 'normal')
+            pdf.setFontSize(8)
+            pdf.setTextColor(rgb.r, rgb.g, rgb.b)
+            pdf.text(` - ${proj.url}`, mainX + pdf.getTextWidth(proj.name || ''), y)
+            pdf.setTextColor(0, 0, 0)
+          }
+          y += 4
+          if (proj.description) {
+            pdf.setFont(font, 'normal')
+            pdf.setFontSize(8)
+            pdf.setTextColor(60, 60, 60)
+            const descLines = pdf.splitTextToSize(proj.description, mainWidth - 5)
+            pdf.text(descLines, mainX + 3, y)
+            pdf.setTextColor(0, 0, 0)
+            y += descLines.length * 3.5 + 1
+          }
+          y += 2
+        })
+      }
+
+      // Certifications in main content
+      if (resumeData.certifications && resumeData.certifications.length > 0 && resumeData.certifications[0].name) {
+        checkPage(8)
+        pdf.setFont(font, 'bold')
+        pdf.setFontSize(11)
+        pdf.setTextColor(0, 0, 0)
+        pdf.text('CERTIFICATIONS', mainX, y)
+        drawLine(mainX, y + 1.5, pdfWidth - 15, 0.3, rgb.r, rgb.g, rgb.b)
+        y += 6
+        resumeData.certifications.forEach((cert) => {
+          checkPage(6)
+          pdf.setFont(font, 'bold')
+          pdf.setFontSize(8)
+          pdf.text(cert.name || '', mainX, y)
+          pdf.setFont(font, 'normal')
+          let extra = ''
+          if (cert.issuer) extra += ` - ${cert.issuer}`
+          if (cert.date) extra += ` (${cert.date})`
+          if (extra) pdf.text(extra, mainX + pdf.getTextWidth(cert.name || ''), y)
+          y += 4
+        })
+      }
+
     } else if (template === 'technical') {
       // Technical: colored section headers
       // Header
@@ -1108,6 +1215,8 @@ export default async function handler(req, res) {
       addExperience(addSectionTechnical)
       addEducation(addSectionTechnical)
       addSkills(addSectionTechnical)
+      addProjects(addSectionTechnical)
+      addCertifications(addSectionTechnical)
 
     } else if (template === 'compact') {
       // Compact: tight spacing
@@ -1130,6 +1239,8 @@ export default async function handler(req, res) {
       addExperience(addSectionCompact)
       addEducation(addSectionCompact)
       addSkills(addSectionCompact)
+      addProjects(addSectionCompact)
+      addCertifications(addSectionCompact)
 
     } else if (template === 'classic') {
       // Classic: centered, formal
@@ -1151,6 +1262,8 @@ export default async function handler(req, res) {
       addExperience(addSectionClassic)
       addEducation(addSectionClassic)
       addSkills(addSectionClassic)
+      addProjects(addSectionClassic)
+      addCertifications(addSectionClassic)
 
     } else if (template === 'minimal') {
       // Minimal: clean, left-aligned, light headers
@@ -1173,6 +1286,8 @@ export default async function handler(req, res) {
       addExperience(addSectionMinimal)
       addEducation(addSectionMinimal)
       addSkills(addSectionMinimal)
+      addProjects(addSectionMinimal)
+      addCertifications(addSectionMinimal)
 
     } else if (template === 'executive') {
       // Executive: formal with colored header border
@@ -1196,6 +1311,8 @@ export default async function handler(req, res) {
       addExperience(addSectionExecutive)
       addEducation(addSectionExecutive)
       addSkills(addSectionExecutive)
+      addProjects(addSectionExecutive)
+      addCertifications(addSectionExecutive)
 
     } else if (template === 'modern') {
       // Modern: bold title with centered layout
@@ -1217,6 +1334,8 @@ export default async function handler(req, res) {
       addExperience(addSectionModern)
       addEducation(addSectionModern)
       addSkills(addSectionModern)
+      addProjects(addSectionModern)
+      addCertifications(addSectionModern)
 
     } else {
       // Default: Modern (fallback)
@@ -1238,6 +1357,8 @@ export default async function handler(req, res) {
       addExperience(addSectionModern)
       addEducation(addSectionModern)
       addSkills(addSectionModern)
+      addProjects(addSectionModern)
+      addCertifications(addSectionModern)
     }
 
     const pdfBuffer = Buffer.from(pdf.output('arraybuffer'))
