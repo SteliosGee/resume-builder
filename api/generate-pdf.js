@@ -270,6 +270,8 @@ export default async function handler(req, res) {
     const color = accentColor || '#2563eb'
     const fontFamily = userFont || 'Inter'
     
+    console.log('Template received:', template, 'Font:', fontFamily)
+    
     // Map user fonts to jsPDF supported fonts
     const fontMap = {
       'Inter': 'helvetica',
