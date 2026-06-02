@@ -1,6 +1,6 @@
 import Stripe from 'stripe'
 import { jsPDF } from 'jspdf'
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle, TabStopType, TabStopPosition } from 'docx'
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle, TabStopType, TabStopPosition, Table, TableRow, TableCell, WidthType, ShadingType, VerticalAlign, convertInchesToTwip } from 'docx'
 import JSZip from 'jszip'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
@@ -407,114 +407,11 @@ function generateDocxExecutive(resumeData, color, font) {
   return buildDocx(children)
 }
 
-function sectionHeaderCreative(title, sectionSize, color, font) {
-  return new Paragraph({
-    children: [new TextRun({ text: title.toUpperCase(), bold: true, size: sectionSize, color, font })],
-    spacing: { before: 240, after: 100 },
-    border: { bottom: { color, style: BorderStyle.DOUBLE, size: 1 } },
-  })
-}
-
-function generateDocxCreative(resumeData, color, font) {
-  const { personal, summary, experience, education, skills, projects, certifications } = resumeData
-  const children = []
-
-  children.push(
-    new Paragraph({ children: [new TextRun({ text: personal.name || 'Your Name', bold: true, size: 48, font, color })], alignment: AlignmentType.LEFT, spacing: { after: 40 } }),
-    new Paragraph({ children: [new TextRun({ text: personal.title || 'Your Title', size: 26, font, color })], alignment: AlignmentType.LEFT, spacing: { after: 100 } }),
-    new Paragraph({
-      children: [new TextRun({
-        text: [personal.email, personal.phone, personal.location, personal.linkedin].filter(Boolean).join('  ✦  '),
-        size: 16, font, color: '666666',
-      })],
-      alignment: AlignmentType.LEFT,
-      spacing: { after: 200 },
-    }),
-    new Paragraph({ children: [], border: { bottom: { color, style: BorderStyle.DOUBLE, size: 1 } }, spacing: { after: 200 } }),
-  )
-
-  if (summary) {
-    children.push(sectionHeaderCreative('About Me', 22, color, font))
-    children.push(new Paragraph({ children: [new TextRun({ text: summary, size: 20, font })], spacing: { after: 150 } }))
-  }
-
-  if (experience && experience.length > 0 && experience[0].title) {
-    children.push(sectionHeaderCreative('Experience', 22, color, font))
-    experience.forEach((exp) => {
-      const dateStr = exp.current ? `${exp.startDate} - Present` : `${exp.startDate} - ${exp.endDate}`
-      children.push(
-        new Paragraph({
-          children: [
-            new TextRun({ text: exp.title || '', bold: true, size: 20, font, color }),
-            new TextRun({ text: `\t${dateStr}`, size: 18, font, color: '888888' }),
-          ],
-          tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
-          spacing: { before: 100 },
-        }),
-        new Paragraph({
-          children: [new TextRun({ text: `${exp.company || ''}${exp.location ? ', ' + exp.location : ''}`, italics: true, size: 18, font, color: '555555' })],
-          spacing: { after: 60 },
-        })
-      )
-      if (exp.bullets) {
-        exp.bullets.forEach((bullet) => {
-          if (bullet) {
-            children.push(new Paragraph({
-              children: [new TextRun({ text: `◆  ${bullet}`, size: 18, font })],
-              indent: { left: 480 },
-              spacing: { after: 30 },
-            }))
-          }
-        })
-      }
-    })
-  }
-
-  if (education && education.length > 0 && education[0].degree) {
-    children.push(sectionHeaderCreative('Education', 22, color, font))
-    education.forEach((edu) => {
-      children.push(
-        new Paragraph({
-          children: [
-            new TextRun({ text: edu.degree || '', bold: true, size: 20, font }),
-            new TextRun({ text: `\t${edu.startDate} - ${edu.endDate}`, size: 18, font, color: '888888' }),
-          ],
-          tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
-          spacing: { before: 80 },
-        }),
-        new Paragraph({
-          children: [new TextRun({ text: edu.school || '', italics: true, size: 18, font, color: '555555' })],
-          spacing: { after: 60 },
-        })
-      )
-    })
-  }
-
-  if (skills && skills.length > 0 && skills[0].category) {
-    children.push(sectionHeaderCreative('Skills', 22, color, font))
-    skills.forEach((skill) => {
-      if (skill.category && skill.items && skill.items.length > 0) {
-        children.push(new Paragraph({
-          children: [
-            new TextRun({ text: `${skill.category}: `, bold: true, size: 20, font, color }),
-            new TextRun({ text: skill.items.join('  •  '), size: 20, font }),
-          ],
-          spacing: { after: 60 },
-        }))
-      }
-    })
-  }
-
-  addProjects(projects, children, 20, font, '◆')
-  addCertifications(certifications, children, 20, font)
-  return buildDocx(children)
-}
-
 function sectionHeaderTechnical(title, sectionSize, color, font) {
   return new Paragraph({
-    children: [new TextRun({ text: title.toUpperCase(), bold: true, size: sectionSize, color, font })],
+    children: [new TextRun({ text: title.toUpperCase(), bold: true, size: sectionSize, color: 'FFFFFF', font })],
     spacing: { before: 200, after: 80 },
-    border: { top: { color, style: BorderStyle.SINGLE, size: 2 } },
+    shading: { type: ShadingType.CLEAR, fill: color, color: 'auto' },
   })
 }
 
