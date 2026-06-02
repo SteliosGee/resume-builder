@@ -407,6 +407,144 @@ function generateDocxExecutive(resumeData, color, font) {
   return buildDocx(children)
 }
 
+function generateDocxCreative(resumeData, color, font) {
+  const { personal, summary, experience, education, skills, projects, certifications } = resumeData
+
+  // Build sidebar children (colored background)
+  const sidebarChildren = []
+  sidebarChildren.push(
+    new Paragraph({ children: [new TextRun({ text: personal.name || 'Your Name', bold: true, size: 36, font, color: 'FFFFFF' })], spacing: { after: 60 } }),
+    new Paragraph({ children: [new TextRun({ text: personal.title || 'Your Title', size: 20, font, color: 'FFFFFF' })], spacing: { after: 200 } }),
+  )
+  const contactItems = [personal.email, personal.phone, personal.location, personal.linkedin].filter(Boolean)
+  contactItems.forEach(item => {
+    sidebarChildren.push(new Paragraph({ children: [new TextRun({ text: item, size: 16, font, color: 'FFFFFF' })], spacing: { after: 40 } }))
+  })
+  if (skills && skills.length > 0 && skills[0].category) {
+    sidebarChildren.push(new Paragraph({ children: [new TextRun({ text: 'SKILLS', bold: true, size: 18, font, color: 'FFFFFF' })], spacing: { before: 200, after: 100 } }))
+    skills.forEach((skill) => {
+      if (skill.category && skill.items && skill.items.length > 0) {
+        sidebarChildren.push(new Paragraph({ children: [new TextRun({ text: skill.category, bold: true, size: 16, font, color: 'FFFFFF' })], spacing: { after: 20 } }))
+        skill.items.forEach(item => {
+          sidebarChildren.push(new Paragraph({ children: [new TextRun({ text: item, size: 16, font, color: 'DDDDDD' })], indent: { left: 120 }, spacing: { after: 15 } }))
+        })
+      }
+    })
+  }
+
+  // Build main content children
+  const mainChildren = []
+  if (summary) {
+    mainChildren.push(new Paragraph({
+      children: [new TextRun({ text: 'PROFESSIONAL SUMMARY', bold: true, size: 22, font })],
+      spacing: { before: 0, after: 80 },
+      border: { bottom: { color, style: BorderStyle.SINGLE, size: 1 } },
+    }))
+    mainChildren.push(new Paragraph({ children: [new TextRun({ text: summary, size: 18, font })], spacing: { after: 150 } }))
+  }
+  if (experience && experience.length > 0 && experience[0].title) {
+    mainChildren.push(new Paragraph({
+      children: [new TextRun({ text: 'EXPERIENCE', bold: true, size: 22, font })],
+      spacing: { before: 100, after: 80 },
+      border: { bottom: { color, style: BorderStyle.SINGLE, size: 1 } },
+    }))
+    experience.forEach((exp) => {
+      const dateStr = exp.current ? `${exp.startDate} - Present` : `${exp.startDate} - ${exp.endDate}`
+      mainChildren.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: exp.title || '', bold: true, size: 18, font }),
+            new TextRun({ text: `\t${dateStr}`, size: 16, font, color: '888888' }),
+          ],
+          tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
+          spacing: { before: 80 },
+        }),
+        new Paragraph({ children: [new TextRun({ text: `${exp.company || ''}${exp.location ? ', ' + exp.location : ''}`, italics: true, size: 16, font, color: '555555' })], spacing: { after: 40 } })
+      )
+      if (exp.bullets) {
+        exp.bullets.forEach((bullet) => {
+          if (bullet) {
+            mainChildren.push(new Paragraph({ children: [new TextRun({ text: `•  ${bullet}`, size: 16, font })], indent: { left: 360 }, spacing: { after: 20 } }))
+          }
+        })
+      }
+    })
+  }
+  if (education && education.length > 0 && education[0].degree) {
+    mainChildren.push(new Paragraph({
+      children: [new TextRun({ text: 'EDUCATION', bold: true, size: 22, font })],
+      spacing: { before: 100, after: 80 },
+      border: { bottom: { color, style: BorderStyle.SINGLE, size: 1 } },
+    }))
+    education.forEach((edu) => {
+      mainChildren.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: edu.degree || '', bold: true, size: 18, font }),
+            new TextRun({ text: `\t${edu.startDate} - ${edu.endDate}`, size: 16, font, color: '888888' }),
+          ],
+          tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
+          spacing: { before: 60 },
+        }),
+        new Paragraph({ children: [new TextRun({ text: edu.school || '', italics: true, size: 16, font, color: '555555' })], spacing: { after: 40 } })
+      )
+    })
+  }
+  if (projects && projects.length > 0 && projects[0].name) {
+    mainChildren.push(new Paragraph({
+      children: [new TextRun({ text: 'PROJECTS', bold: true, size: 22, font })],
+      spacing: { before: 100, after: 80 },
+      border: { bottom: { color, style: BorderStyle.SINGLE, size: 1 } },
+    }))
+    projects.forEach((proj) => {
+      mainChildren.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: proj.name || '', bold: true, size: 18, font }),
+            new TextRun({ text: proj.url ? ` - ${proj.url}` : '', size: 16, font, color: '0563C1' }),
+          ],
+          spacing: { before: 60 },
+        })
+      )
+      if (proj.description) {
+        mainChildren.push(new Paragraph({ children: [new TextRun({ text: proj.description, size: 16, font })], spacing: { after: 20 } }))
+      }
+    })
+  }
+
+  // Two-column table: colored sidebar + white main
+  const sidebarWidth = 2200
+  const table = new Table({
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            width: { size: sidebarWidth, type: WidthType.DXA },
+            shading: { type: ShadingType.CLEAR, fill: color, color: 'auto' },
+            verticalAlign: VerticalAlign.TOP,
+            children: sidebarChildren,
+          }),
+          new TableCell({
+            width: { size: 9000 - sidebarWidth, type: WidthType.DXA },
+            verticalAlign: VerticalAlign.TOP,
+            children: mainChildren,
+          }),
+        ],
+      }),
+    ],
+    width: { size: 9000, type: WidthType.DXA },
+  })
+
+  return new Document({
+    sections: [{
+      properties: {
+        page: { margin: { top: 600, bottom: 600, left: 600, right: 600 } },
+      },
+      children: [table],
+    }],
+  })
+}
+
 function sectionHeaderTechnical(title, sectionSize, color, font) {
   return new Paragraph({
     children: [new TextRun({ text: title.toUpperCase(), bold: true, size: sectionSize, color: 'FFFFFF', font })],
