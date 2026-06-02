@@ -395,7 +395,7 @@ function AppContent() {
 
       {activeTab === 'ats' && (
         <main className="app-main ats-mode">
-          <ATSScore resumeData={resumeData} />
+          <ATSScore />
         </main>
       )}
 

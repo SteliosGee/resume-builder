@@ -1,10 +1,9 @@
 import { useState } from 'react'
 
-function ATSScore({ resumeData }) {
+function ATSScore() {
   const [uploadedText, setUploadedText] = useState('')
   const [fileName, setFileName] = useState('')
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [uploadMode, setUploadMode] = useState(false)
 
   const extractTextFromPDF = async (file) => {
     const pdfjsLib = await import('pdfjs-dist')
@@ -214,8 +213,7 @@ function ATSScore({ resumeData }) {
     return { score: percentage, grade, issues }
   }
 
-  const dataToAnalyze = uploadedText || ''
-  const { score, grade, issues } = dataToAnalyze ? analyzeText(dataToAnalyze) : { score: 0, grade: '-', issues: [] }
+  const { score, grade, issues } = uploadedText ? analyzeText(uploadedText) : { score: 0, grade: '-', issues: [] }
 
   const getScoreColor = () => {
     if (score >= 80) return '#22c55e'
@@ -229,48 +227,33 @@ function ATSScore({ resumeData }) {
 
   return (
     <div className="ats-container">
-      <div className="ats-tabs">
-        <button
-          className={`ats-tab ${!uploadMode ? 'active' : ''}`}
-          onClick={() => setUploadMode(false)}
-        >
-          Analyze Builder Resume
-        </button>
-        <button
-          className={`ats-tab ${uploadMode ? 'active' : ''}`}
-          onClick={() => setUploadMode(true)}
-        >
-          Upload Resume
-        </button>
+      <div className="ats-upload">
+        <label className="upload-area">
+          <input
+            type="file"
+            accept=".pdf,.txt"
+            onChange={handleFileUpload}
+            hidden
+          />
+          {isAnalyzing ? (
+            <span>Analyzing...</span>
+          ) : fileName ? (
+            <>
+              <span className="upload-icon">📄</span>
+              <span className="file-name">{fileName}</span>
+              <span className="upload-hint">Click to upload a different file</span>
+            </>
+          ) : (
+            <>
+              <span className="upload-icon">📄</span>
+              <span className="upload-text">Upload your resume</span>
+              <span className="upload-hint">PDF or TXT file</span>
+            </>
+          )}
+        </label>
       </div>
 
-      {uploadMode && (
-        <div className="ats-upload">
-          <label className="upload-area">
-            <input
-              type="file"
-              accept=".pdf,.txt"
-              onChange={handleFileUpload}
-              hidden
-            />
-            {isAnalyzing ? (
-              <span>Analyzing...</span>
-            ) : fileName ? (
-              <span className="file-name">{fileName}</span>
-            ) : (
-              <span>Click to upload PDF or TXT file</span>
-            )}
-          </label>
-        </div>
-      )}
-
-      {!uploadMode && !resumeData?.personal?.name && (
-        <div className="ats-empty">
-          <p>Fill in the resume builder to see your ATS score</p>
-        </div>
-      )}
-
-      {(uploadMode ? uploadedText : resumeData?.personal?.name) && (
+      {uploadedText && (
         <div className="ats-score">
           <div className="ats-header">
             <h3>ATS Score</h3>

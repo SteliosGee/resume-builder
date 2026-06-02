@@ -1407,54 +1407,29 @@ body {
   width: 100%;
 }
 
-.ats-tabs {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.ats-tab {
-  flex: 1;
-  padding: 0.75rem;
-  border: 1px solid var(--gray-200);
-  background: white;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--gray-600);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.ats-tab:hover {
-  border-color: var(--primary);
-}
-
-.ats-tab.active {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-}
-
 .ats-upload {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .upload-area {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  gap: 0.75rem;
+  padding: 3rem 2rem;
   border: 2px dashed var(--gray-300);
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.15s ease;
-  background: var(--gray-50);
+  transition: all 0.2s ease;
+  background: white;
+  box-shadow: var(--shadow-sm);
 }
 
 .upload-area:hover {
   border-color: var(--primary);
-  background: white;
+  background: var(--gray-50);
+  box-shadow: var(--shadow-md);
 }
 
 .upload-area span {
@@ -1467,21 +1442,23 @@ body {
   font-weight: 500;
 }
 
-.ats-empty {
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  text-align: center;
-  box-shadow: var(--shadow-md);
+.upload-icon {
+  font-size: 2.5rem;
+  color: var(--gray-400);
 }
 
-.ats-empty p {
-  color: var(--gray-500);
-  margin: 0;
+.upload-text {
+  font-size: 1rem;
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+.upload-hint {
+  font-size: 0.8125rem;
+  color: var(--gray-400);
 }
 
 .ats-score {
-  max-width: 400px;
   width: 100%;
   background: white;
   border-radius: 12px;
