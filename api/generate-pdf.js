@@ -16,6 +16,7 @@ export const config = {
 }
 
 function generateDocx(resumeData, accentColor, template, fontFamily) {
+  console.log('generateDocx called with template:', template)
   const { personal, summary, experience, education, skills, projects, certifications } = resumeData
   const font = fontFamily || 'Calibri'
   const color = accentColor.replace('#', '')
@@ -270,29 +271,7 @@ export default async function handler(req, res) {
     const color = accentColor || '#2563eb'
     const fontFamily = userFont || 'Inter'
     
-    console.log('Template received:', template, 'Font:', fontFamily)
-    
-    // Map user fonts to jsPDF supported fonts
-    const fontMap = {
-      'Inter': 'helvetica',
-      'Arial': 'helvetica',
-      'Helvetica': 'helvetica',
-      'Calibri': 'helvetica',
-      'Georgia': 'times',
-      'Times New Roman': 'times',
-      'Garamond': 'times',
-      'Palatino': 'times',
-    }
-    const font = fontMap[fontFamily] || 'helvetica'
-    const hexToRgb = (hex) => {
-      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-      return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-      } : { r: 37, g: 99, b: 235 }
-    }
-    const rgb = hexToRgb(color)
+    console.log('Template received:', template, 'Font:', fontFamily, 'Color:', color)
 
     // Generate PDF based on template
     const pdf = new jsPDF('p', 'mm', 'a4')
