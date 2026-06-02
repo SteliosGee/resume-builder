@@ -3,6 +3,7 @@ import ResumeForm from './components/ResumeForm'
 import ResumePreview from './components/ResumePreview'
 import TemplateSelector from './components/TemplateSelector'
 import PaymentModal from './components/PaymentModal'
+import FAQ from './components/FAQ'
 
 const TEMPLATES = [
   { id: 'modern', name: 'Modern', description: 'Clean design with accent colors' },
@@ -127,6 +128,7 @@ function App() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [showPayment, setShowPayment] = useState(false)
   const [paymentMessage, setPaymentMessage] = useState(null)
+  const [activeTab, setActiveTab] = useState('editor')
   const resumeRef = useRef(null)
 
   useEffect(function() {
@@ -284,7 +286,7 @@ function App() {
               onClick={handleDownloadClick}
               disabled={isGenerating}
             >
-              {isGenerating ? 'Generating...' : 'Download PDF - €1'}
+              {isGenerating ? 'Generating...' : 'Download'}
             </button>
           </div>
         </div>
@@ -297,42 +299,67 @@ function App() {
         </div>
       )}
 
-      <div className="template-bar">
-        <span className="template-label">Template:</span>
-        <TemplateSelector
-          templates={TEMPLATES}
-          selected={template}
-          onSelect={setTemplate}
-        />
-        <div className="color-picker-group">
-          <label className="color-picker-label">Color:</label>
-          <input
-            type="color"
-            value={accentColor}
-            onChange={(e) => setAccentColor(e.target.value)}
-            className="color-picker"
-          />
-        </div>
+      <div className="tabs-bar">
         <button
-          className="btn btn-ghost mobile-preview-toggle"
-          onClick={() => setShowPreview(!showPreview)}
+          className={`tab-btn ${activeTab === 'editor' ? 'active' : ''}`}
+          onClick={() => setActiveTab('editor')}
         >
-          {showPreview ? 'Edit' : 'Preview'}
+          Editor
+        </button>
+        <button
+          className={`tab-btn ${activeTab === 'faq' ? 'active' : ''}`}
+          onClick={() => setActiveTab('faq')}
+        >
+          FAQ
         </button>
       </div>
 
-      <main className="app-main">
-        <div className={`form-panel ${showPreview ? 'hide-mobile' : ''}`}>
-          <ResumeForm resumeData={resumeData} setResumeData={setResumeData} />
-        </div>
-        <div className={`preview-panel ${showPreview ? '' : 'hide-mobile'}`}>
-          <div className="preview-container">
-            <div ref={resumeRef} className="resume-print-area">
-              <ResumePreview resumeData={resumeData} template={template} accentColor={accentColor} />
+      {activeTab === 'editor' && (
+        <>
+          <div className="template-bar">
+            <span className="template-label">Template:</span>
+            <TemplateSelector
+              templates={TEMPLATES}
+              selected={template}
+              onSelect={setTemplate}
+            />
+            <div className="color-picker-group">
+              <label className="color-picker-label">Color:</label>
+              <input
+                type="color"
+                value={accentColor}
+                onChange={(e) => setAccentColor(e.target.value)}
+                className="color-picker"
+              />
             </div>
+            <button
+              className="btn btn-ghost mobile-preview-toggle"
+              onClick={() => setShowPreview(!showPreview)}
+            >
+              {showPreview ? 'Edit' : 'Preview'}
+            </button>
           </div>
-        </div>
-      </main>
+
+          <main className="app-main">
+            <div className={`form-panel ${showPreview ? 'hide-mobile' : ''}`}>
+              <ResumeForm resumeData={resumeData} setResumeData={setResumeData} />
+            </div>
+            <div className={`preview-panel ${showPreview ? '' : 'hide-mobile'}`}>
+              <div className="preview-container">
+                <div ref={resumeRef} className="resume-print-area">
+                  <ResumePreview resumeData={resumeData} template={template} accentColor={accentColor} />
+                </div>
+              </div>
+            </div>
+          </main>
+        </>
+      )}
+
+      {activeTab === 'faq' && (
+        <main className="app-main faq-mode">
+          <FAQ />
+        </main>
+      )}
 
       <footer className="app-footer">
         <p>Need help? Contact us at <a href="mailto:stelios.galegalidis@gmail.com">stelios.galegalidis@gmail.com</a></p>
