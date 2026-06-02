@@ -5,7 +5,6 @@ export default defineConfig({
   plugins: [react()],
   build: {
     target: 'es2015',
-    minify: 'terser',
   },
   server: {
     host: true,
