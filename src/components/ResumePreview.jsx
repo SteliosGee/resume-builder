@@ -13,13 +13,13 @@ function ResumePreview({ resumeData, template, accentColor, sectionOrder }) {
   const sectionMap = {
     summary: summary && (
       <section className="resume-section" key="summary">
-        <h2>Professional Summary</h2>
+        <h2 style={{ color, borderColor: color }}>Professional Summary</h2>
         <p className="summary-text">{summary}</p>
       </section>
     ),
     experience: experience && experience.length > 0 && experience[0].title && (
       <section className="resume-section" key="experience">
-        <h2>Work Experience</h2>
+        <h2 style={{ color, borderColor: color }}>Work Experience</h2>
         {experience.map((exp) => (
           <div key={exp.id} className="experience-entry">
             <div className="entry-header">
@@ -45,7 +45,7 @@ function ResumePreview({ resumeData, template, accentColor, sectionOrder }) {
     ),
     education: education && education.length > 0 && education[0].degree && (
       <section className="resume-section" key="education">
-        <h2>Education</h2>
+        <h2 style={{ color, borderColor: color }}>Education</h2>
         {education.map((edu) => (
           <div key={edu.id} className="education-entry">
             <div className="entry-header">
@@ -65,11 +65,11 @@ function ResumePreview({ resumeData, template, accentColor, sectionOrder }) {
     ),
     skills: skills && skills.length > 0 && skills[0].category && (
       <section className="resume-section" key="skills">
-        <h2>Skills</h2>
+        <h2 style={{ color, borderColor: color }}>Skills</h2>
         <div className="skills-grid">
           {skills.map((skill) => (
             <div key={skill.id} className="skill-group">
-              <span className="skill-category">{skill.category}:</span>
+              <span className="skill-category" style={{ color }}>{skill.category}:</span>
               <span className="skill-items">{skill.items.join(', ')}</span>
             </div>
           ))}
@@ -78,7 +78,7 @@ function ResumePreview({ resumeData, template, accentColor, sectionOrder }) {
     ),
     projects: projects && projects.length > 0 && projects[0].name && (
       <section className="resume-section" key="projects">
-        <h2>Projects</h2>
+        <h2 style={{ color, borderColor: color }}>Projects</h2>
         {projects.map((project) => (
           <div key={project.id} className="project-entry">
             <div className="entry-header">
@@ -89,7 +89,7 @@ function ResumePreview({ resumeData, template, accentColor, sectionOrder }) {
             {project.technologies && project.technologies.length > 0 && (
               <div className="tech-tags">
                 {project.technologies.map((tech, i) => (
-                  <span key={i} className="tech-tag">{tech}</span>
+                  <span key={i} className="tech-tag" style={{ borderColor: color, color }}>{tech}</span>
                 ))}
               </div>
             )}
@@ -99,7 +99,7 @@ function ResumePreview({ resumeData, template, accentColor, sectionOrder }) {
     ),
     certifications: certifications && certifications.length > 0 && certifications[0].name && (
       <section className="resume-section" key="certifications">
-        <h2>Certifications</h2>
+        <h2 style={{ color, borderColor: color }}>Certifications</h2>
         {certifications.map((cert) => (
           <div key={cert.id} className="certification-entry">
             <div className="entry-header">

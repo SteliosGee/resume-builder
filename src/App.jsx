@@ -7,6 +7,10 @@ import FAQ from './components/FAQ'
 import ATSScore from './components/ATSScore'
 import SectionReorder from './components/SectionReorder'
 import CoverLetter from './components/CoverLetter'
+import Tooltip from './components/Tooltip'
+import LoadingSkeleton from './components/LoadingSkeleton'
+import SuccessAnimation from './components/SuccessAnimation'
+import { ToastProvider, useToast } from './components/Toast'
 
 const TEMPLATES = [
   { id: 'modern', name: 'Modern', description: 'Clean design with accent colors' },
@@ -90,13 +94,13 @@ const defaultResumeData = {
   ],
 }
 
-function App() {
+function AppContent() {
+  const { addToast } = useToast()
   const [resumeData, setResumeData] = useState(function() {
     try {
       var saved = localStorage.getItem('resumeData')
       if (saved) {
         var parsed = JSON.parse(saved)
-        // Ensure all required arrays exist
         return {
           ...defaultResumeData,
           ...parsed,
@@ -133,6 +137,7 @@ function App() {
   const [paymentMessage, setPaymentMessage] = useState(null)
   const [activeTab, setActiveTab] = useState('editor')
   const [sectionOrder, setSectionOrder] = useState(['summary', 'experience', 'education', 'skills', 'projects', 'certifications'])
+  const [showSuccess, setShowSuccess] = useState(false)
   const resumeRef = useRef(null)
 
   useEffect(function() {
@@ -197,7 +202,6 @@ function App() {
         throw new Error(error.error || 'Failed to generate PDF')
       }
 
-      // Get filename from Content-Disposition header or use default
       const contentDisposition = response.headers.get('Content-Disposition')
       let filename = `${resumeData.personal.name.replace(/\s+/g, '_')}_Resume.zip`
       if (contentDisposition) {
@@ -214,13 +218,14 @@ function App() {
       document.body.appendChild(a)
       a.click()
       
-      // Cleanup after a short delay
       setTimeout(() => {
         document.body.removeChild(a)
         window.URL.revokeObjectURL(url)
       }, 100)
       
-      setPaymentMessage({ type: 'success', text: 'PDF & DOCX downloaded successfully!' })
+      setShowSuccess(true)
+      addToast('Resume downloaded successfully!', 'success')
+      setTimeout(() => setShowSuccess(false), 2500)
     } catch (error) {
       console.error('Error:', error)
       setPaymentMessage({ type: 'error', text: error.message || 'Error generating PDF' })
@@ -237,6 +242,7 @@ function App() {
     if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
       localStorage.removeItem('resumeData')
       setResumeData(defaultResumeData)
+      addToast('Resume data cleared', 'info')
     }
   }
 
@@ -248,6 +254,7 @@ function App() {
     a.download = `${resumeData.personal.name.replace(/\s+/g, '_')}_Resume.json`
     a.click()
     URL.revokeObjectURL(url)
+    addToast('Resume exported as JSON', 'success')
   }
 
   const handleImportJSON = (e) => {
@@ -259,8 +266,9 @@ function App() {
       try {
         const data = JSON.parse(event.target.result)
         setResumeData(data)
+        addToast('Resume imported successfully', 'success')
       } catch {
-        alert('Invalid JSON file')
+        addToast('Invalid JSON file', 'error')
       }
     }
     reader.readAsText(file)
@@ -275,23 +283,30 @@ function App() {
             <span className="logo-text">ProBuilder</span>
           </div>
           <div className="header-actions">
-            <button className="btn btn-outline" onClick={handleExportJSON}>
-              Export JSON
-            </button>
+            <Tooltip text="Export resume data">
+              <button className="btn btn-outline" onClick={handleExportJSON}>
+                Export
+              </button>
+            </Tooltip>
             <label className="btn btn-outline">
-              Import JSON
+              Import
               <input type="file" accept=".json" onChange={handleImportJSON} hidden />
             </label>
-            <button className="btn btn-outline" onClick={handleClearData}>
-              Reset
-            </button>
-            <button 
-              className="btn btn-primary" 
-              onClick={handleDownloadClick}
-              disabled={isGenerating}
-            >
-              {isGenerating ? 'Generating...' : 'Download'}
-            </button>
+            <Tooltip text="Clear all data">
+              <button className="btn btn-outline" onClick={handleClearData}>
+                Reset
+              </button>
+            </Tooltip>
+            {isGenerating ? (
+              <button className="btn btn-primary" disabled>
+                <span className="loading-spinner-small"></span>
+                Generating...
+              </button>
+            ) : (
+              <button className="btn btn-primary" onClick={handleDownloadClick}>
+                Download
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -400,7 +415,17 @@ function App() {
           resumeName={resumeData.personal.name}
         />
       )}
+
+      <SuccessAnimation show={showSuccess} />
     </div>
+  )
+}
+
+function App() {
+  return (
+    <ToastProvider>
+      <AppContent />
+    </ToastProvider>
   )
 }
 

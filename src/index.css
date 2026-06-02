@@ -1087,6 +1087,7 @@ body {
 .resume.technical h2 {
   font-size: 12pt;
   font-weight: 700;
+  background: var(--primary);
   color: white;
   padding: 0.25rem 0.5rem;
   margin-bottom: 0.5rem;
@@ -2184,4 +2185,355 @@ body {
 
 .payment-message button:hover {
   opacity: 1;
+}
+
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.3s ease;
+  min-width: 280px;
+  max-width: 400px;
+}
+
+.toast-success {
+  border-left: 4px solid var(--success);
+}
+
+.toast-error {
+  border-left: 4px solid var(--danger);
+}
+
+.toast-info {
+  border-left: 4px solid var(--primary);
+}
+
+.toast-icon {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.toast-success .toast-icon {
+  color: var(--success);
+}
+
+.toast-error .toast-icon {
+  color: var(--danger);
+}
+
+.toast-info .toast-icon {
+  color: var(--primary);
+}
+
+.toast-message {
+  flex: 1;
+  font-size: 0.9375rem;
+  color: var(--gray-800);
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--gray-400);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.toast-close:hover {
+  color: var(--gray-600);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Tooltips */
+.tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 0.75rem;
+  background: var(--gray-900);
+  color: white;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 1000;
+  animation: fadeIn 0.15s ease;
+}
+
+.tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--gray-900);
+}
+
+.tooltip-top::after {
+  top: auto;
+  bottom: 100%;
+  border-top-color: transparent;
+  border-bottom-color: var(--gray-900);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Loading Spinner Small */
+.loading-spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+/* Loading Skeleton */
+.skeleton-container {
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  max-width: 500px;
+}
+
+.skeleton-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--gray-200) 25%, var(--gray-100) 50%, var(--gray-200) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-title {
+  height: 2rem;
+  width: 60%;
+  margin: 0 auto 0.5rem;
+}
+
+.skeleton-subtitle {
+  height: 1rem;
+  width: 40%;
+  margin: 0 auto;
+}
+
+.skeleton-section {
+  margin-bottom: 1.5rem;
+}
+
+.skeleton-heading {
+  height: 1.25rem;
+  width: 30%;
+  margin-bottom: 0.75rem;
+}
+
+.skeleton-line {
+  height: 0.875rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-line.short {
+  width: 70%;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Success Animation */
+.success-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  animation: fadeIn 0.3s ease;
+}
+
+.success-checkmark {
+  text-align: center;
+}
+
+.checkmark-svg {
+  width: 100px;
+  height: 100px;
+}
+
+.checkmark-circle {
+  fill: none;
+  stroke: var(--success);
+  stroke-width: 3;
+  stroke-dasharray: 283;
+  stroke-dashoffset: 283;
+  animation: circleDraw 0.6s ease forwards;
+}
+
+.checkmark-check {
+  fill: none;
+  stroke: var(--success);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: checkDraw 0.4s ease forwards 0.4s;
+}
+
+.success-text {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+@keyframes circleDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes checkDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Smooth Transitions */
+.tab-btn {
+  transition: all 0.2s ease;
+}
+
+.btn {
+  transition: all 0.2s ease;
+}
+
+.form-group input,
+.form-group textarea {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover Effects */
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.template-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.faq-item:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.dark-mode .ats-header h3,
+.dark-mode .cover-letter-form h3 {
+  color: #f1f5f9;
+}
+
+.dark-mode .form-section h4 {
+  color: #e2e8f0;
+  border-color: #334155;
+}
+
+.dark-mode .ats-stats .stat.error {
+  color: #f87171;
+}
+
+.dark-mode .ats-stats .stat.warning {
+  color: #fbbf24;
+}
+
+.dark-mode .ats-stats .stat.info {
+  color: #60a5fa;
+}
+
+.dark-mode .ats-issue {
+  background: #0f172a;
+}
+
+.dark-mode .ats-issue.error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+
+.dark-mode .ats-issue.warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fcd34d;
+}
+
+.dark-mode .ats-issue.info {
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+}
+
+.dark-mode .ats-score-text .score {
+  color: #f1f5f9;
+}
+
+.dark-mode .tooltip {
+  background: #334155;
+}
+
+.dark-mode .tooltip::after {
+  border-top-color: #334155;
+}
+
+.dark-mode .cover-letter-page {
+  background: white;
+  color: #111827;
+}
+
+.dark-mode .cover-letter-page p,
+.dark-mode .cover-letter-page h1 {
+  color: #111827 !important;
 }
