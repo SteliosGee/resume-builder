@@ -717,6 +717,13 @@ export default async function handler(req, res) {
     
     console.log('Template received:', template, 'Font:', fontFamily, 'Color:', color)
 
+    const hex = color.replace('#', '')
+    const rgb = {
+      r: parseInt(hex.substring(0, 2), 16),
+      g: parseInt(hex.substring(2, 4), 16),
+      b: parseInt(hex.substring(4, 6), 16),
+    }
+
     // Generate PDF based on template
     const pdf = new jsPDF('p', 'mm', 'a4')
     const pdfWidth = pdf.internal.pageSize.getWidth()
