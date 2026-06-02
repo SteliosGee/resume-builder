@@ -22,23 +22,92 @@ function generateDocx(resumeData, accentColor, template, fontFamily) {
 
   const children = []
 
-  // Template-specific header alignment
+  // Template-specific configuration
   const headerAlign = ['classic', 'executive', 'modern'].includes(template) ? AlignmentType.CENTER : AlignmentType.LEFT
-  const nameSize = template === 'compact' ? 40 : template === 'minimal' ? 44 : template === 'creative' ? 44 : 52
-  const titleSize = template === 'compact' ? 22 : 24
-  const bodySize = template === 'compact' ? 18 : 20
-  const sectionSize = template === 'compact' ? 20 : 22
+  
+  // Template-specific sizing
+  let nameSize, titleSize, bodySize, sectionSize, titleColor, titleBold
+  
+  if (template === 'compact') {
+    nameSize = 40
+    titleSize = 22
+    bodySize = 18
+    sectionSize = 20
+    titleColor = '000000'
+    titleBold = false
+  } else if (template === 'minimal') {
+    nameSize = 44
+    titleSize = 24
+    bodySize = 20
+    sectionSize = 22
+    titleColor = '888888'
+    titleBold = false
+  } else if (template === 'creative') {
+    nameSize = 44
+    titleSize = 26
+    bodySize = 20
+    sectionSize = 22
+    titleColor = color
+    titleBold = true
+  } else if (template === 'technical') {
+    nameSize = 52
+    titleSize = 28
+    bodySize = 20
+    sectionSize = 22
+    titleColor = color
+    titleBold = true
+  } else if (template === 'executive') {
+    nameSize = 52
+    titleSize = 28
+    bodySize = 20
+    sectionSize = 22
+    titleColor = '000000'
+    titleBold = false
+  } else if (template === 'classic') {
+    nameSize = 52
+    titleSize = 26
+    bodySize = 20
+    sectionSize = 22
+    titleColor = '000000'
+    titleBold = false
+  } else { // modern (default)
+    nameSize = 52
+    titleSize = 28
+    bodySize = 20
+    sectionSize = 22
+    titleColor = color
+    titleBold = true
+  }
 
   // Helper to create section header based on template
   const createSectionHeader = (title) => {
-    const borderStyle = template === 'classic' ? { bottom: { color: '333333', style: BorderStyle.SINGLE, size: 2 } }
-      : template === 'executive' ? { bottom: { color, style: BorderStyle.SINGLE, size: 3 } }
-      : template === 'minimal' ? {}
-      : template === 'compact' ? { bottom: { color: '333333', style: BorderStyle.SINGLE, size: 1 } }
-      : { bottom: { color, style: BorderStyle.SINGLE, size: 1 } }
+    let borderStyle, headerColor
+    
+    if (template === 'classic') {
+      borderStyle = { bottom: { color: '333333', style: BorderStyle.SINGLE, size: 2 } }
+      headerColor = '000000'
+    } else if (template === 'executive') {
+      borderStyle = { bottom: { color, style: BorderStyle.SINGLE, size: 3 } }
+      headerColor = '000000'
+    } else if (template === 'minimal') {
+      borderStyle = {}
+      headerColor = '888888'
+    } else if (template === 'compact') {
+      borderStyle = { bottom: { color: '333333', style: BorderStyle.SINGLE, size: 1 } }
+      headerColor = '000000'
+    } else if (template === 'technical') {
+      borderStyle = { top: { color, style: BorderStyle.SINGLE, size: 2 } }
+      headerColor = color
+    } else if (template === 'creative') {
+      borderStyle = { bottom: { color, style: BorderStyle.DOUBLE, size: 1 } }
+      headerColor = color
+    } else { // modern
+      borderStyle = { bottom: { color, style: BorderStyle.SINGLE, size: 1 } }
+      headerColor = color
+    }
 
     return new Paragraph({
-      children: [new TextRun({ text: title.toUpperCase(), bold: true, size: sectionSize, color: template === 'minimal' ? '888888' : color, font })],
+      children: [new TextRun({ text: title.toUpperCase(), bold: true, size: sectionSize, color: headerColor, font })],
       spacing: { before: 200, after: 80 },
       border: borderStyle,
     })
@@ -52,7 +121,7 @@ function generateDocx(resumeData, accentColor, template, fontFamily) {
       spacing: { after: 80 },
     }),
     new Paragraph({
-      children: [new TextRun({ text: personal.title || 'Your Title', size: titleSize, color, font })],
+      children: [new TextRun({ text: personal.title || 'Your Title', size: titleSize, bold: titleBold, color: titleColor, font })],
       alignment: headerAlign,
       spacing: { after: 80 },
     }),
@@ -60,7 +129,8 @@ function generateDocx(resumeData, accentColor, template, fontFamily) {
       children: [new TextRun({
         text: [personal.email, personal.phone, personal.location, personal.linkedin].filter(Boolean).join(' | '),
         size: bodySize - 2,
-        font
+        font,
+        color: template === 'minimal' ? '666666' : '000000'
       })],
       alignment: headerAlign,
       spacing: { after: 200 },
