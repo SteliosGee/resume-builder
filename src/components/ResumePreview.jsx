@@ -1,4 +1,4 @@
-function ResumePreview({ resumeData, template, accentColor, sectionOrder }) {
+function ResumePreview({ resumeData, template, accentColor, sectionOrder, fontFamily }) {
   const { personal, summary, experience, education, skills, projects, certifications } = resumeData || {}
 
   const formatDate = (startDate, endDate, current) => {
@@ -8,6 +8,7 @@ function ResumePreview({ resumeData, template, accentColor, sectionOrder }) {
   }
 
   const color = accentColor || '#2563eb'
+  const font = fontFamily || 'Inter'
   const order = sectionOrder || ['summary', 'experience', 'education', 'skills', 'projects', 'certifications']
 
   const sectionMap = {
@@ -119,7 +120,7 @@ function ResumePreview({ resumeData, template, accentColor, sectionOrder }) {
 
   if (template === 'modern') {
     return (
-      <div className="resume modern">
+      <div className="resume modern" style={{ fontFamily: font }}>
         <header className="resume-header">
           <div className="header-main">
             <h1>{personal.name || 'Your Name'}</h1>
@@ -140,7 +141,7 @@ function ResumePreview({ resumeData, template, accentColor, sectionOrder }) {
 
   if (template === 'classic') {
     return (
-      <div className="resume classic">
+      <div className="resume classic" style={{ fontFamily: font }}>
         <header className="resume-header">
           <h1>{personal.name || 'Your Name'}</h1>
           <p className="title">{personal.title || 'Your Title'}</p>
@@ -158,7 +159,7 @@ function ResumePreview({ resumeData, template, accentColor, sectionOrder }) {
 
   if (template === 'executive') {
     return (
-      <div className="resume executive">
+      <div className="resume executive" style={{ fontFamily: font }}>
         <header className="resume-header">
           <div className="header-border" style={{ borderColor: color }}>
             <h1>{personal.name || 'Your Name'}</h1>
@@ -179,7 +180,7 @@ function ResumePreview({ resumeData, template, accentColor, sectionOrder }) {
 
   if (template === 'creative') {
     return (
-      <div className="resume creative">
+      <div className="resume creative" style={{ fontFamily: font }}>
         <div className="sidebar" style={{ background: color }}>
           <div className="profile-section">
             <h1>{personal.name || 'Your Name'}</h1>
@@ -215,7 +216,7 @@ function ResumePreview({ resumeData, template, accentColor, sectionOrder }) {
 
   if (template === 'technical') {
     return (
-      <div className="resume technical">
+      <div className="resume technical" style={{ fontFamily: font }}>
         <header className="resume-header">
           <h1>{personal.name || 'Your Name'}</h1>
           <p className="title" style={{ color }}>{personal.title || 'Your Title'}</p>
@@ -233,7 +234,7 @@ function ResumePreview({ resumeData, template, accentColor, sectionOrder }) {
 
   if (template === 'compact') {
     return (
-      <div className="resume compact">
+      <div className="resume compact" style={{ fontFamily: font }}>
         <header className="resume-header">
           <div className="header-left">
             <h1>{personal.name || 'Your Name'}</h1>
@@ -261,7 +262,7 @@ function ResumePreview({ resumeData, template, accentColor, sectionOrder }) {
 
   // Minimal template
   return (
-    <div className="resume minimal">
+    <div className="resume minimal" style={{ fontFamily: font }}>
       <header className="resume-header">
         <h1>{personal.name || 'Your Name'}</h1>
         <div className="contact-row">

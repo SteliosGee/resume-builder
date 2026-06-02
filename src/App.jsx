@@ -131,6 +131,13 @@ function AppContent() {
       return '#2563eb'
     }
   })
+  const [fontFamily, setFontFamily] = useState(function() {
+    try {
+      return localStorage.getItem('resumeFontFamily') || 'Inter'
+    } catch (e) {
+      return 'Inter'
+    }
+  })
   const [showPreview, setShowPreview] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
   const [showPayment, setShowPayment] = useState(false)
@@ -163,6 +170,14 @@ function AppContent() {
       console.error('Failed to save color:', e)
     }
   }, [accentColor])
+
+  useEffect(function() {
+    try {
+      localStorage.setItem('resumeFontFamily', fontFamily)
+    } catch (e) {
+      console.error('Failed to save font:', e)
+    }
+  }, [fontFamily])
 
   // Handle Stripe redirect
   useEffect(function() {
@@ -363,6 +378,23 @@ function AppContent() {
                 className="color-picker"
               />
             </div>
+            <div className="font-picker-group">
+              <label className="font-picker-label">Font:</label>
+              <select
+                value={fontFamily}
+                onChange={(e) => setFontFamily(e.target.value)}
+                className="font-picker"
+              >
+                <option value="Inter">Inter</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Arial">Arial</option>
+                <option value="Helvetica">Helvetica</option>
+                <option value="Calibri">Calibri</option>
+                <option value="Garamond">Garamond</option>
+                <option value="Palatino">Palatino</option>
+              </select>
+            </div>
             <button
               className="btn btn-ghost mobile-preview-toggle"
               onClick={() => setShowPreview(!showPreview)}
@@ -379,7 +411,7 @@ function AppContent() {
             <div className={`preview-panel ${showPreview ? '' : 'hide-mobile'}`}>
               <div className="preview-container">
                 <div ref={resumeRef} className="resume-print-area">
-                  <ResumePreview resumeData={resumeData} template={template} accentColor={accentColor} sectionOrder={sectionOrder} />
+                  <ResumePreview resumeData={resumeData} template={template} accentColor={accentColor} sectionOrder={sectionOrder} fontFamily={fontFamily} />
                 </div>
               </div>
             </div>
