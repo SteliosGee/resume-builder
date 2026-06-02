@@ -209,6 +209,8 @@ function AppContent() {
           sessionId,
           resumeData,
           accentColor,
+          template,
+          fontFamily,
         }),
       })
 

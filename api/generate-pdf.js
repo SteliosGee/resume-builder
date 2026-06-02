@@ -15,20 +15,21 @@ export const config = {
   },
 }
 
-function generateDocx(resumeData, accentColor) {
+function generateDocx(resumeData, accentColor, template, fontFamily) {
   const { personal, summary, experience, education, skills, projects, certifications } = resumeData
+  const font = fontFamily || 'Calibri'
 
   const children = []
 
   // Header
   children.push(
     new Paragraph({
-      children: [new TextRun({ text: personal.name || 'Your Name', bold: true, size: 64, font: 'Calibri' })],
+      children: [new TextRun({ text: personal.name || 'Your Name', bold: true, size: 64, font })],
       alignment: AlignmentType.CENTER,
       spacing: { after: 100 },
     }),
     new Paragraph({
-      children: [new TextRun({ text: personal.title || 'Your Title', size: 32, color: accentColor.replace('#', ''), font: 'Calibri' })],
+      children: [new TextRun({ text: personal.title || 'Your Title', size: 32, color: accentColor.replace('#', ''), font })],
       alignment: AlignmentType.CENTER,
       spacing: { after: 100 },
     }),
@@ -36,7 +37,7 @@ function generateDocx(resumeData, accentColor) {
       children: [new TextRun({
         text: [personal.email, personal.phone, personal.location, personal.linkedin].filter(Boolean).join(' | '),
         size: 20,
-        font: 'Calibri'
+        font
       })],
       alignment: AlignmentType.CENTER,
       spacing: { after: 300 },
@@ -47,12 +48,12 @@ function generateDocx(resumeData, accentColor) {
   if (summary) {
     children.push(
       new Paragraph({
-        children: [new TextRun({ text: 'PROFESSIONAL SUMMARY', bold: true, size: 24, color: accentColor.replace('#', ''), font: 'Calibri' })],
+        children: [new TextRun({ text: 'PROFESSIONAL SUMMARY', bold: true, size: 24, color: accentColor.replace('#', ''), font })],
         spacing: { before: 200, after: 100 },
         border: { bottom: { color: accentColor.replace('#', ''), style: BorderStyle.SINGLE, size: 1 } },
       }),
       new Paragraph({
-        children: [new TextRun({ text: summary, size: 20, font: 'Calibri' })],
+        children: [new TextRun({ text: summary, size: 20, font })],
         spacing: { after: 200 },
       })
     )
@@ -62,7 +63,7 @@ function generateDocx(resumeData, accentColor) {
   if (experience && experience.length > 0 && experience[0].title) {
     children.push(
       new Paragraph({
-        children: [new TextRun({ text: 'WORK EXPERIENCE', bold: true, size: 24, color: accentColor.replace('#', ''), font: 'Calibri' })],
+        children: [new TextRun({ text: 'WORK EXPERIENCE', bold: true, size: 24, color: accentColor.replace('#', ''), font })],
         spacing: { before: 200, after: 100 },
         border: { bottom: { color: accentColor.replace('#', ''), style: BorderStyle.SINGLE, size: 1 } },
       })
@@ -73,14 +74,14 @@ function generateDocx(resumeData, accentColor) {
       children.push(
         new Paragraph({
           children: [
-            new TextRun({ text: exp.title || '', bold: true, size: 20, font: 'Calibri' }),
-            new TextRun({ text: `\t${dateStr}`, size: 20, font: 'Calibri' }),
+            new TextRun({ text: exp.title || '', bold: true, size: 20, font }),
+            new TextRun({ text: `\t${dateStr}`, size: 20, font }),
           ],
           tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
           spacing: { before: 100 },
         }),
         new Paragraph({
-          children: [new TextRun({ text: `${exp.company || ''}${exp.location ? ', ' + exp.location : ''}`, italics: true, size: 20, font: 'Calibri' })],
+          children: [new TextRun({ text: `${exp.company || ''}${exp.location ? ', ' + exp.location : ''}`, italics: true, size: 20, font })],
           spacing: { after: 100 },
         })
       )
@@ -90,7 +91,7 @@ function generateDocx(resumeData, accentColor) {
           if (bullet) {
             children.push(
               new Paragraph({
-                children: [new TextRun({ text: `• ${bullet}`, size: 20, font: 'Calibri' })],
+                children: [new TextRun({ text: `• ${bullet}`, size: 20, font })],
                 indent: { left: 720 },
                 spacing: { after: 50 },
               })
@@ -105,7 +106,7 @@ function generateDocx(resumeData, accentColor) {
   if (education && education.length > 0 && education[0].degree) {
     children.push(
       new Paragraph({
-        children: [new TextRun({ text: 'EDUCATION', bold: true, size: 24, color: accentColor.replace('#', ''), font: 'Calibri' })],
+        children: [new TextRun({ text: 'EDUCATION', bold: true, size: 24, color: accentColor.replace('#', ''), font })],
         spacing: { before: 200, after: 100 },
         border: { bottom: { color: accentColor.replace('#', ''), style: BorderStyle.SINGLE, size: 1 } },
       })
@@ -116,14 +117,14 @@ function generateDocx(resumeData, accentColor) {
       children.push(
         new Paragraph({
           children: [
-            new TextRun({ text: edu.degree || '', bold: true, size: 20, font: 'Calibri' }),
-            new TextRun({ text: `\t${dateStr}`, size: 20, font: 'Calibri' }),
+            new TextRun({ text: edu.degree || '', bold: true, size: 20, font }),
+            new TextRun({ text: `\t${dateStr}`, size: 20, font }),
           ],
           tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
           spacing: { before: 100 },
         }),
         new Paragraph({
-          children: [new TextRun({ text: edu.school || '', italics: true, size: 20, font: 'Calibri' })],
+          children: [new TextRun({ text: edu.school || '', italics: true, size: 20, font })],
           spacing: { after: 100 },
         })
       )
@@ -134,7 +135,7 @@ function generateDocx(resumeData, accentColor) {
   if (skills && skills.length > 0 && skills[0].category) {
     children.push(
       new Paragraph({
-        children: [new TextRun({ text: 'SKILLS', bold: true, size: 24, color: accentColor.replace('#', ''), font: 'Calibri' })],
+        children: [new TextRun({ text: 'SKILLS', bold: true, size: 24, color: accentColor.replace('#', ''), font })],
         spacing: { before: 200, after: 100 },
         border: { bottom: { color: accentColor.replace('#', ''), style: BorderStyle.SINGLE, size: 1 } },
       })
@@ -145,8 +146,8 @@ function generateDocx(resumeData, accentColor) {
         children.push(
           new Paragraph({
             children: [
-              new TextRun({ text: `${skill.category}: `, bold: true, size: 20, font: 'Calibri' }),
-              new TextRun({ text: skill.items.join(', '), size: 20, font: 'Calibri' }),
+              new TextRun({ text: `${skill.category}: `, bold: true, size: 20, font }),
+              new TextRun({ text: skill.items.join(', '), size: 20, font }),
             ],
             spacing: { after: 100 },
           })
@@ -183,7 +184,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { sessionId, resumeData, accentColor } = req.body
+    const { sessionId, resumeData, accentColor, template, fontFamily: userFont } = req.body
 
     if (!sessionId) {
       return res.status(400).json({ success: false, error: 'No session ID provided' })
@@ -196,6 +197,20 @@ export default async function handler(req, res) {
     }
 
     const color = accentColor || '#2563eb'
+    const fontFamily = userFont || 'Inter'
+    
+    // Map user fonts to jsPDF supported fonts
+    const fontMap = {
+      'Inter': 'helvetica',
+      'Arial': 'helvetica',
+      'Helvetica': 'helvetica',
+      'Calibri': 'helvetica',
+      'Georgia': 'times',
+      'Times New Roman': 'times',
+      'Garamond': 'times',
+      'Palatino': 'times',
+    }
+    const font = fontMap[fontFamily] || 'helvetica'
     const hexToRgb = (hex) => {
       const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
       return result ? {
@@ -212,11 +227,11 @@ export default async function handler(req, res) {
     const pdfHeight = pdf.internal.pageSize.getHeight()
 
     pdf.setFontSize(32)
-    pdf.setFont('helvetica', 'bold')
+    pdf.setFont(font, 'bold')
     pdf.text(resumeData.personal.name || 'Your Name', pdfWidth / 2, 20, { align: 'center' })
 
     pdf.setFontSize(16)
-    pdf.setFont('helvetica', 'normal')
+    pdf.setFont(font, 'normal')
     pdf.setTextColor(rgb.r, rgb.g, rgb.b)
     pdf.text(resumeData.personal.title || 'Your Title', pdfWidth / 2, 28, { align: 'center' })
 
@@ -240,7 +255,7 @@ export default async function handler(req, res) {
         y = 20
       }
       pdf.setFontSize(12)
-      pdf.setFont('helvetica', 'bold')
+      pdf.setFont(font, 'bold')
       pdf.setTextColor(rgb.r, rgb.g, rgb.b)
       pdf.text(title, 15, y)
       pdf.setDrawColor(rgb.r, rgb.g, rgb.b)
@@ -254,7 +269,7 @@ export default async function handler(req, res) {
     if (resumeData.summary) {
       addSection('PROFESSIONAL SUMMARY', resumeData.summary)
       const lines = pdf.splitTextToSize(resumeData.summary, pdfWidth - 30)
-      pdf.setFont('helvetica', 'normal')
+      pdf.setFont(font, 'normal')
       pdf.text(lines, 15, y)
       y += lines.length * 5 + 5
     }
@@ -263,20 +278,20 @@ export default async function handler(req, res) {
       addSection('WORK EXPERIENCE', resumeData.experience)
       resumeData.experience.forEach((exp) => {
         if (y > pdfHeight - 30) { pdf.addPage(); y = 20 }
-        pdf.setFont('helvetica', 'bold')
+        pdf.setFont(font, 'bold')
         pdf.text(exp.title || '', 15, y)
-        pdf.setFont('helvetica', 'normal')
+        pdf.setFont(font, 'normal')
         const dateStr = exp.current ? `${exp.startDate} - Present` : `${exp.startDate} - ${exp.endDate}`
         pdf.text(dateStr, pdfWidth - 15, y, { align: 'right' })
         y += 5
-        pdf.setFont('helvetica', 'italic')
+        pdf.setFont(font, 'italic')
         pdf.text(`${exp.company || ''}${exp.location ? ', ' + exp.location : ''}`, 15, y)
         y += 5
         if (exp.bullets && exp.bullets.length > 0) {
           exp.bullets.forEach((bullet) => {
             if (bullet) {
               const bulletLines = pdf.splitTextToSize('• ' + bullet, pdfWidth - 35)
-              pdf.setFont('helvetica', 'normal')
+              pdf.setFont(font, 'normal')
               pdf.text(bulletLines, 18, y)
               y += bulletLines.length * 4 + 1
             }
@@ -290,12 +305,12 @@ export default async function handler(req, res) {
       addSection('EDUCATION', resumeData.education)
       resumeData.education.forEach((edu) => {
         if (y > pdfHeight - 30) { pdf.addPage(); y = 20 }
-        pdf.setFont('helvetica', 'bold')
+        pdf.setFont(font, 'bold')
         pdf.text(edu.degree || '', 15, y)
-        pdf.setFont('helvetica', 'normal')
+        pdf.setFont(font, 'normal')
         pdf.text(`${edu.startDate} - ${edu.endDate}`, pdfWidth - 15, y, { align: 'right' })
         y += 5
-        pdf.setFont('helvetica', 'italic')
+        pdf.setFont(font, 'italic')
         pdf.text(edu.school || '', 15, y)
         y += 5
       })
@@ -305,9 +320,9 @@ export default async function handler(req, res) {
       addSection('SKILLS', resumeData.skills)
       resumeData.skills.forEach((skill) => {
         if (skill.category && skill.items && skill.items.length > 0) {
-          pdf.setFont('helvetica', 'bold')
+          pdf.setFont(font, 'bold')
           pdf.text(`${skill.category}: `, 15, y)
-          pdf.setFont('helvetica', 'normal')
+          pdf.setFont(font, 'normal')
           const skillsText = skill.items.join(', ')
           const skillsWidth = pdf.getTextWidth(`${skill.category}: `)
           pdf.text(skillsText, 15 + skillsWidth, y)
@@ -318,8 +333,8 @@ export default async function handler(req, res) {
 
     const pdfBuffer = Buffer.from(pdf.output('arraybuffer'))
 
-    // Generate DOCX
-    const doc = generateDocx(resumeData, color)
+    // Generate DOCX (use original fontFamily, not mapped)
+    const doc = generateDocx(resumeData, color, template, fontFamily)
     const docxBuffer = await Packer.toBuffer(doc)
 
     // Create ZIP with both files
