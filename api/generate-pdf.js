@@ -144,7 +144,7 @@ function addCertifications(certifications, children, bodySize, font) {
 
 function sectionHeaderModern(title, sectionSize, color, font) {
   return new Paragraph({
-    children: [new TextRun({ text: title.toUpperCase(), bold: true, size: sectionSize, color, font })],
+    children: [new TextRun({ text: title, bold: true, size: sectionSize, color, font })],
     spacing: { before: 200, after: 80 },
     border: { bottom: { color, style: BorderStyle.SINGLE, size: 1 } },
   })
@@ -190,14 +190,20 @@ function generateDocxModern(resumeData, color, font) {
     })
   }
 
+  if (projects && projects.length > 0 && projects[0].name) {
+    children.push(sectionHeaderModern('Projects', 22, color, font))
+  }
   addProjects(projects, children, 20, font)
+  if (certifications && certifications.length > 0 && certifications[0].name) {
+    children.push(sectionHeaderModern('Certifications', 22, color, font))
+  }
   addCertifications(certifications, children, 20, font)
   return buildDocx(children)
 }
 
 function sectionHeaderClassic(title, sectionSize, font) {
   return new Paragraph({
-    children: [new TextRun({ text: title.toUpperCase(), bold: true, size: sectionSize, color: '000000', font })],
+    children: [new TextRun({ text: title, bold: true, size: sectionSize, color: '000000', font })],
     spacing: { before: 240, after: 80 },
     border: { bottom: { color: '333333', style: BorderStyle.SINGLE, size: 2 } },
   })
@@ -244,14 +250,20 @@ function generateDocxClassic(resumeData, color, font) {
     })
   }
 
+  if (projects && projects.length > 0 && projects[0].name) {
+    children.push(sectionHeaderClassic('Projects', 22, font))
+  }
   addProjects(projects, children, 20, font)
+  if (certifications && certifications.length > 0 && certifications[0].name) {
+    children.push(sectionHeaderClassic('Certifications', 22, font))
+  }
   addCertifications(certifications, children, 20, font)
   return buildDocx(children)
 }
 
 function sectionHeaderMinimal(title, sectionSize, font) {
   return new Paragraph({
-    children: [new TextRun({ text: title.toUpperCase(), size: sectionSize, color: '999999', font })],
+    children: [new TextRun({ text: title, size: sectionSize, color: '999999', font })],
     spacing: { before: 280, after: 100 },
   })
 }
@@ -279,7 +291,7 @@ function generateDocxMinimal(resumeData, color, font) {
   }
 
   if (experience && experience.length > 0 && experience[0].title) {
-    children.push(sectionHeaderMinimal('Experience', 20, font))
+    children.push(sectionHeaderMinimal('Work Experience', 20, font))
     experience.forEach((exp) => {
       const dateStr = exp.current ? `${exp.startDate} - Present` : `${exp.startDate} - ${exp.endDate}`
       children.push(
@@ -347,14 +359,20 @@ function generateDocxMinimal(resumeData, color, font) {
     })
   }
 
+  if (projects && projects.length > 0 && projects[0].name) {
+    children.push(sectionHeaderMinimal('Projects', 20, font))
+  }
   addProjects(projects, children, 18, font, '→')
+  if (certifications && certifications.length > 0 && certifications[0].name) {
+    children.push(sectionHeaderMinimal('Certifications', 20, font))
+  }
   addCertifications(certifications, children, 18, font)
   return buildDocx(children, { top: 900, bottom: 900, left: 900, right: 900 })
 }
 
 function sectionHeaderExecutive(title, sectionSize, color, font) {
   return new Paragraph({
-    children: [new TextRun({ text: title.toUpperCase(), bold: true, size: sectionSize, color: '000000', font })],
+    children: [new TextRun({ text: title, bold: true, size: sectionSize, color: '000000', font })],
     spacing: { before: 240, after: 80 },
     border: { bottom: { color, style: BorderStyle.SINGLE, size: 3 } },
   })
@@ -402,7 +420,13 @@ function generateDocxExecutive(resumeData, color, font) {
     })
   }
 
+  if (projects && projects.length > 0 && projects[0].name) {
+    children.push(sectionHeaderExecutive('Projects', 22, color, font))
+  }
   addProjects(projects, children, 20, font)
+  if (certifications && certifications.length > 0 && certifications[0].name) {
+    children.push(sectionHeaderExecutive('Certifications', 22, color, font))
+  }
   addCertifications(certifications, children, 20, font)
   return buildDocx(children)
 }
@@ -421,7 +445,7 @@ function generateDocxCreative(resumeData, color, font) {
     sidebarChildren.push(new Paragraph({ children: [new TextRun({ text: item, size: 16, font, color: 'FFFFFF' })], spacing: { after: 40 } }))
   })
   if (skills && skills.length > 0 && skills[0].category) {
-    sidebarChildren.push(new Paragraph({ children: [new TextRun({ text: 'SKILLS', bold: true, size: 18, font, color: 'FFFFFF' })], spacing: { before: 200, after: 100 } }))
+    sidebarChildren.push(new Paragraph({ children: [new TextRun({ text: 'Skills', bold: true, size: 18, font, color: 'FFFFFF' })], spacing: { before: 200, after: 100 } }))
     skills.forEach((skill) => {
       if (skill.category && skill.items && skill.items.length > 0) {
         sidebarChildren.push(new Paragraph({ children: [new TextRun({ text: skill.category, bold: true, size: 16, font, color: 'FFFFFF' })], spacing: { after: 20 } }))
@@ -436,7 +460,7 @@ function generateDocxCreative(resumeData, color, font) {
   const mainChildren = []
   if (summary) {
     mainChildren.push(new Paragraph({
-      children: [new TextRun({ text: 'PROFESSIONAL SUMMARY', bold: true, size: 22, font })],
+      children: [new TextRun({ text: 'Professional Summary', bold: true, size: 22, font })],
       spacing: { before: 0, after: 80 },
       border: { bottom: { color, style: BorderStyle.SINGLE, size: 1 } },
     }))
@@ -444,7 +468,7 @@ function generateDocxCreative(resumeData, color, font) {
   }
   if (experience && experience.length > 0 && experience[0].title) {
     mainChildren.push(new Paragraph({
-      children: [new TextRun({ text: 'EXPERIENCE', bold: true, size: 22, font })],
+      children: [new TextRun({ text: 'Work Experience', bold: true, size: 22, font })],
       spacing: { before: 100, after: 80 },
       border: { bottom: { color, style: BorderStyle.SINGLE, size: 1 } },
     }))
@@ -472,7 +496,7 @@ function generateDocxCreative(resumeData, color, font) {
   }
   if (education && education.length > 0 && education[0].degree) {
     mainChildren.push(new Paragraph({
-      children: [new TextRun({ text: 'EDUCATION', bold: true, size: 22, font })],
+      children: [new TextRun({ text: 'Education', bold: true, size: 22, font })],
       spacing: { before: 100, after: 80 },
       border: { bottom: { color, style: BorderStyle.SINGLE, size: 1 } },
     }))
@@ -492,7 +516,7 @@ function generateDocxCreative(resumeData, color, font) {
   }
   if (projects && projects.length > 0 && projects[0].name) {
     mainChildren.push(new Paragraph({
-      children: [new TextRun({ text: 'PROJECTS', bold: true, size: 22, font })],
+      children: [new TextRun({ text: 'Projects', bold: true, size: 22, font })],
       spacing: { before: 100, after: 80 },
       border: { bottom: { color, style: BorderStyle.SINGLE, size: 1 } },
     }))
@@ -513,7 +537,7 @@ function generateDocxCreative(resumeData, color, font) {
   }
   if (certifications && certifications.length > 0 && certifications[0].name) {
     mainChildren.push(new Paragraph({
-      children: [new TextRun({ text: 'CERTIFICATIONS', bold: true, size: 22, font })],
+      children: [new TextRun({ text: 'Certifications', bold: true, size: 22, font })],
       spacing: { before: 100, after: 80 },
       border: { bottom: { color, style: BorderStyle.SINGLE, size: 1 } },
     }))
@@ -564,7 +588,7 @@ function generateDocxCreative(resumeData, color, font) {
 
 function sectionHeaderTechnical(title, sectionSize, color, font) {
   return new Paragraph({
-    children: [new TextRun({ text: title.toUpperCase(), bold: true, size: sectionSize, color: 'FFFFFF', font })],
+    children: [new TextRun({ text: title, bold: true, size: sectionSize, color: 'FFFFFF', font })],
     spacing: { before: 200, after: 80 },
     shading: { type: ShadingType.CLEAR, fill: color, color: 'auto' },
   })
@@ -640,13 +664,16 @@ function generateDocxTechnical(resumeData, color, font) {
     addEducation(education, children, 20, font)
   }
 
+  if (certifications && certifications.length > 0 && certifications[0].name) {
+    children.push(sectionHeaderTechnical('Certifications', 22, color, font))
+  }
   addCertifications(certifications, children, 20, font)
   return buildDocx(children)
 }
 
 function sectionHeaderCompact(title, sectionSize, font) {
   return new Paragraph({
-    children: [new TextRun({ text: title.toUpperCase(), bold: true, size: sectionSize, color: '333333', font })],
+    children: [new TextRun({ text: title, bold: true, size: sectionSize, color: '333333', font })],
     spacing: { before: 160, after: 60 },
     border: { bottom: { color: 'cccccc', style: BorderStyle.SINGLE, size: 1 } },
   })
@@ -675,7 +702,7 @@ function generateDocxCompact(resumeData, color, font) {
   }
 
   if (experience && experience.length > 0 && experience[0].title) {
-    children.push(sectionHeaderCompact('Experience', 18, font))
+    children.push(sectionHeaderCompact('Work Experience', 18, font))
     experience.forEach((exp) => {
       const dateStr = exp.current ? `${exp.startDate} - Present` : `${exp.startDate} - ${exp.endDate}`
       children.push(
@@ -733,7 +760,13 @@ function generateDocxCompact(resumeData, color, font) {
     })
   }
 
+  if (projects && projects.length > 0 && projects[0].name) {
+    children.push(sectionHeaderCompact('Projects', 18, font))
+  }
   addProjects(projects, children, 18, font, '-')
+  if (certifications && certifications.length > 0 && certifications[0].name) {
+    children.push(sectionHeaderCompact('Certifications', 18, font))
+  }
   addCertifications(certifications, children, 18, font)
   return buildDocx(children, { top: 600, bottom: 600, left: 600, right: 600 })
 }
@@ -752,7 +785,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { sessionId, resumeData, accentColor, template, fontFamily: userFont } = req.body
+    const { sessionId, resumeData, accentColor, template, fontFamily: userFont, sectionOrder: userOrder } = req.body
 
     if (!sessionId) {
       return res.status(400).json({ success: false, error: 'No session ID provided' })
@@ -804,7 +837,7 @@ export default async function handler(req, res) {
       pdf.setFontSize(11)
       pdf.setFont(font, 'bold')
       pdf.setTextColor(rgb.r, rgb.g, rgb.b)
-      pdf.text(title.toUpperCase(), 15, y)
+      pdf.text(title, 15, y)
       drawLine(15, y + 1.5, pdfWidth - 15, 0.3, rgb.r, rgb.g, rgb.b)
       y += 6
       pdf.setTextColor(0, 0, 0)
@@ -815,7 +848,7 @@ export default async function handler(req, res) {
       pdf.setFontSize(11)
       pdf.setFont(font, 'bold')
       pdf.setTextColor(0, 0, 0)
-      pdf.text(title.toUpperCase(), 15, y)
+      pdf.text(title, 15, y)
       drawLine(15, y + 1.5, pdfWidth - 15, 0.5, 0, 0, 0)
       y += 6
     }
@@ -825,7 +858,7 @@ export default async function handler(req, res) {
       pdf.setFontSize(10)
       pdf.setFont(font, 'bold')
       pdf.setTextColor(120, 120, 120)
-      pdf.text(title.toUpperCase(), 15, y)
+      pdf.text(title, 15, y)
       y += 5
       pdf.setTextColor(0, 0, 0)
     }
@@ -835,7 +868,7 @@ export default async function handler(req, res) {
       pdf.setFontSize(11)
       pdf.setFont(font, 'bold')
       pdf.setTextColor(0, 0, 0)
-      pdf.text(title.toUpperCase(), 15, y)
+      pdf.text(title, 15, y)
       drawLine(15, y + 1.5, pdfWidth - 15, 0.8, rgb.r, rgb.g, rgb.b)
       y += 6
     }
@@ -847,7 +880,7 @@ export default async function handler(req, res) {
       pdf.setFontSize(10)
       pdf.setFont(font, 'bold')
       pdf.setTextColor(255, 255, 255)
-      pdf.text(title.toUpperCase(), 17, y)
+      pdf.text(title, 17, y)
       y += 6
       pdf.setTextColor(0, 0, 0)
     }
@@ -857,7 +890,7 @@ export default async function handler(req, res) {
       pdf.setFontSize(9)
       pdf.setFont(font, 'bold')
       pdf.setTextColor(0, 0, 0)
-      pdf.text(title.toUpperCase(), 12, y)
+      pdf.text(title, 12, y)
       drawLine(12, y + 1, pdfWidth - 12, 0.3, 0, 0, 0)
       y += 4
     }
@@ -1005,6 +1038,19 @@ export default async function handler(req, res) {
       })
     }
 
+    const order = userOrder || ['summary', 'experience', 'education', 'skills', 'projects', 'certifications']
+    const runSections = (sectionFn) => {
+      const map = {
+        summary: () => addSummary(sectionFn),
+        experience: () => addExperience(sectionFn),
+        education: () => addEducation(sectionFn),
+        skills: () => addSkills(sectionFn),
+        projects: () => addProjects(sectionFn),
+        certifications: () => addCertifications(sectionFn),
+      }
+      order.forEach(s => { if (map[s]) map[s]() })
+    }
+
     if (template === 'creative') {
       // Creative: colored sidebar
       const sidebarWidth = 55
@@ -1048,7 +1094,7 @@ export default async function handler(req, res) {
         y += 6
         pdf.setFont(font, 'bold')
         pdf.setFontSize(10)
-        pdf.text('SKILLS', 8, y)
+        pdf.text('Skills', 8, y)
         y += 6
         resumeData.skills.forEach((skill) => {
           if (skill.category && skill.items && skill.items.length > 0) {
@@ -1072,141 +1118,145 @@ export default async function handler(req, res) {
       const mainWidth = pdfWidth - sidebarWidth - 23
       y = 20
 
-      if (resumeData.summary) {
-        pdf.setFont(font, 'bold')
-        pdf.setFontSize(11)
-        pdf.setTextColor(0, 0, 0)
-        pdf.text('PROFESSIONAL SUMMARY', mainX, y)
-        drawLine(mainX, y + 1.5, pdfWidth - 15, 0.3, rgb.r, rgb.g, rgb.b)
-        y += 6
-        const lines = pdf.splitTextToSize(resumeData.summary, mainWidth)
-        pdf.setFont(font, 'normal')
-        pdf.setFontSize(9)
-        pdf.setTextColor(60, 60, 60)
-        pdf.text(lines, mainX, y)
-        y += lines.length * 4 + 5
-      }
-
-      if (resumeData.experience && resumeData.experience.length > 0 && resumeData.experience[0].title) {
-        pdf.setFont(font, 'bold')
-        pdf.setFontSize(11)
-        pdf.setTextColor(0, 0, 0)
-        pdf.text('EXPERIENCE', mainX, y)
-        drawLine(mainX, y + 1.5, pdfWidth - 15, 0.3, rgb.r, rgb.g, rgb.b)
-        y += 6
-        resumeData.experience.forEach((exp) => {
-          checkPage(20)
-          const dateStr = exp.current ? `${exp.startDate} - Present` : `${exp.startDate} - ${exp.endDate}`
-          pdf.setFont(font, 'bold')
-          pdf.setFontSize(9)
-          pdf.text(exp.title || '', mainX, y)
-          pdf.setFont(font, 'normal')
-          pdf.text(dateStr, pdfWidth - 15, y, { align: 'right' })
-          y += 4
-          pdf.setFont(font, 'italic')
-          pdf.setFontSize(8)
-          pdf.setTextColor(80, 80, 80)
-          pdf.text(`${exp.company || ''}${exp.location ? ', ' + exp.location : ''}`, mainX, y)
-          pdf.setTextColor(0, 0, 0)
-          y += 4
-          if (exp.bullets && exp.bullets.length > 0) {
-            exp.bullets.forEach((bullet) => {
-              if (bullet) {
-                checkPage(8)
-                const bulletLines = pdf.splitTextToSize('• ' + bullet, mainWidth - 5)
-                pdf.setFont(font, 'normal')
-                pdf.setFontSize(8)
-                pdf.text(bulletLines, mainX + 3, y)
-                y += bulletLines.length * 3.5 + 0.5
+      const addCreativeSection = (type) => {
+        if (type === 'summary') {
+          if (resumeData.summary) {
+            pdf.setFont(font, 'bold')
+            pdf.setFontSize(11)
+            pdf.setTextColor(0, 0, 0)
+            pdf.text('Professional Summary', mainX, y)
+            drawLine(mainX, y + 1.5, pdfWidth - 15, 0.3, rgb.r, rgb.g, rgb.b)
+            y += 6
+            const lines = pdf.splitTextToSize(resumeData.summary, mainWidth)
+            pdf.setFont(font, 'normal')
+            pdf.setFontSize(9)
+            pdf.setTextColor(60, 60, 60)
+            pdf.text(lines, mainX, y)
+            y += lines.length * 4 + 5
+          }
+        } else if (type === 'experience') {
+          if (resumeData.experience && resumeData.experience.length > 0 && resumeData.experience[0].title) {
+            pdf.setFont(font, 'bold')
+            pdf.setFontSize(11)
+            pdf.setTextColor(0, 0, 0)
+            pdf.text('Work Experience', mainX, y)
+            drawLine(mainX, y + 1.5, pdfWidth - 15, 0.3, rgb.r, rgb.g, rgb.b)
+            y += 6
+            resumeData.experience.forEach((exp) => {
+              checkPage(20)
+              const dateStr = exp.current ? `${exp.startDate} - Present` : `${exp.startDate} - ${exp.endDate}`
+              pdf.setFont(font, 'bold')
+              pdf.setFontSize(9)
+              pdf.text(exp.title || '', mainX, y)
+              pdf.setFont(font, 'normal')
+              pdf.text(dateStr, pdfWidth - 15, y, { align: 'right' })
+              y += 4
+              pdf.setFont(font, 'italic')
+              pdf.setFontSize(8)
+              pdf.setTextColor(80, 80, 80)
+              pdf.text(`${exp.company || ''}${exp.location ? ', ' + exp.location : ''}`, mainX, y)
+              pdf.setTextColor(0, 0, 0)
+              y += 4
+              if (exp.bullets && exp.bullets.length > 0) {
+                exp.bullets.forEach((bullet) => {
+                  if (bullet) {
+                    checkPage(8)
+                    const bulletLines = pdf.splitTextToSize('• ' + bullet, mainWidth - 5)
+                    pdf.setFont(font, 'normal')
+                    pdf.setFontSize(8)
+                    pdf.text(bulletLines, mainX + 3, y)
+                    y += bulletLines.length * 3.5 + 0.5
+                  }
+                })
               }
+              y += 2
             })
           }
-          y += 2
-        })
-      }
-
-      if (resumeData.education && resumeData.education.length > 0 && resumeData.education[0].degree) {
-        checkPage(15)
-        pdf.setFont(font, 'bold')
-        pdf.setFontSize(11)
-        pdf.setTextColor(0, 0, 0)
-        pdf.text('EDUCATION', mainX, y)
-        drawLine(mainX, y + 1.5, pdfWidth - 15, 0.3, rgb.r, rgb.g, rgb.b)
-        y += 6
-        resumeData.education.forEach((edu) => {
-          checkPage(12)
-          pdf.setFont(font, 'bold')
-          pdf.setFontSize(9)
-          pdf.text(edu.degree || '', mainX, y)
-          pdf.setFont(font, 'normal')
-          pdf.text(`${edu.startDate} - ${edu.endDate}`, pdfWidth - 15, y, { align: 'right' })
-          y += 4
-          pdf.setFont(font, 'italic')
-          pdf.setFontSize(8)
-          pdf.setTextColor(80, 80, 80)
-          pdf.text(edu.school || '', mainX, y)
-          pdf.setTextColor(0, 0, 0)
-          y += 5
-        })
-      }
-
-      // Projects in main content
-      if (resumeData.projects && resumeData.projects.length > 0 && resumeData.projects[0].name) {
-        checkPage(12)
-        pdf.setFont(font, 'bold')
-        pdf.setFontSize(11)
-        pdf.setTextColor(0, 0, 0)
-        pdf.text('PROJECTS', mainX, y)
-        drawLine(mainX, y + 1.5, pdfWidth - 15, 0.3, rgb.r, rgb.g, rgb.b)
-        y += 6
-        resumeData.projects.forEach((proj) => {
-          checkPage(10)
-          pdf.setFont(font, 'bold')
-          pdf.setFontSize(9)
-          pdf.text(proj.name || '', mainX, y)
-          if (proj.url) {
-            pdf.setFont(font, 'normal')
-            pdf.setFontSize(8)
-            pdf.setTextColor(rgb.r, rgb.g, rgb.b)
-            pdf.text(` - ${proj.url}`, mainX + pdf.getTextWidth(proj.name || ''), y)
+        } else if (type === 'education') {
+          if (resumeData.education && resumeData.education.length > 0 && resumeData.education[0].degree) {
+            checkPage(15)
+            pdf.setFont(font, 'bold')
+            pdf.setFontSize(11)
             pdf.setTextColor(0, 0, 0)
+            pdf.text('Education', mainX, y)
+            drawLine(mainX, y + 1.5, pdfWidth - 15, 0.3, rgb.r, rgb.g, rgb.b)
+            y += 6
+            resumeData.education.forEach((edu) => {
+              checkPage(12)
+              pdf.setFont(font, 'bold')
+              pdf.setFontSize(9)
+              pdf.text(edu.degree || '', mainX, y)
+              pdf.setFont(font, 'normal')
+              pdf.text(`${edu.startDate} - ${edu.endDate}`, pdfWidth - 15, y, { align: 'right' })
+              y += 4
+              pdf.setFont(font, 'italic')
+              pdf.setFontSize(8)
+              pdf.setTextColor(80, 80, 80)
+              pdf.text(edu.school || '', mainX, y)
+              pdf.setTextColor(0, 0, 0)
+              y += 5
+            })
           }
-          y += 4
-          if (proj.description) {
-            pdf.setFont(font, 'normal')
-            pdf.setFontSize(8)
-            pdf.setTextColor(60, 60, 60)
-            const descLines = pdf.splitTextToSize(proj.description, mainWidth - 5)
-            pdf.text(descLines, mainX + 3, y)
+        } else if (type === 'projects') {
+          if (resumeData.projects && resumeData.projects.length > 0 && resumeData.projects[0].name) {
+            checkPage(12)
+            pdf.setFont(font, 'bold')
+            pdf.setFontSize(11)
             pdf.setTextColor(0, 0, 0)
-            y += descLines.length * 3.5 + 1
+            pdf.text('Projects', mainX, y)
+            drawLine(mainX, y + 1.5, pdfWidth - 15, 0.3, rgb.r, rgb.g, rgb.b)
+            y += 6
+            resumeData.projects.forEach((proj) => {
+              checkPage(10)
+              pdf.setFont(font, 'bold')
+              pdf.setFontSize(9)
+              pdf.text(proj.name || '', mainX, y)
+              if (proj.url) {
+                pdf.setFont(font, 'normal')
+                pdf.setFontSize(8)
+                pdf.setTextColor(rgb.r, rgb.g, rgb.b)
+                pdf.text(` - ${proj.url}`, mainX + pdf.getTextWidth(proj.name || ''), y)
+                pdf.setTextColor(0, 0, 0)
+              }
+              y += 4
+              if (proj.description) {
+                pdf.setFont(font, 'normal')
+                pdf.setFontSize(8)
+                pdf.setTextColor(60, 60, 60)
+                const descLines = pdf.splitTextToSize(proj.description, mainWidth - 5)
+                pdf.text(descLines, mainX + 3, y)
+                pdf.setTextColor(0, 0, 0)
+                y += descLines.length * 3.5 + 1
+              }
+              y += 2
+            })
           }
-          y += 2
-        })
+        } else if (type === 'certifications') {
+          if (resumeData.certifications && resumeData.certifications.length > 0 && resumeData.certifications[0].name) {
+            checkPage(8)
+            pdf.setFont(font, 'bold')
+            pdf.setFontSize(11)
+            pdf.setTextColor(0, 0, 0)
+            pdf.text('Certifications', mainX, y)
+            drawLine(mainX, y + 1.5, pdfWidth - 15, 0.3, rgb.r, rgb.g, rgb.b)
+            y += 6
+            resumeData.certifications.forEach((cert) => {
+              checkPage(6)
+              pdf.setFont(font, 'bold')
+              pdf.setFontSize(8)
+              pdf.text(cert.name || '', mainX, y)
+              pdf.setFont(font, 'normal')
+              let extra = ''
+              if (cert.issuer) extra += ` - ${cert.issuer}`
+              if (cert.date) extra += ` (${cert.date})`
+              if (extra) pdf.text(extra, mainX + pdf.getTextWidth(cert.name || ''), y)
+              y += 4
+            })
+          }
+        }
       }
 
-      // Certifications in main content
-      if (resumeData.certifications && resumeData.certifications.length > 0 && resumeData.certifications[0].name) {
-        checkPage(8)
-        pdf.setFont(font, 'bold')
-        pdf.setFontSize(11)
-        pdf.setTextColor(0, 0, 0)
-        pdf.text('CERTIFICATIONS', mainX, y)
-        drawLine(mainX, y + 1.5, pdfWidth - 15, 0.3, rgb.r, rgb.g, rgb.b)
-        y += 6
-        resumeData.certifications.forEach((cert) => {
-          checkPage(6)
-          pdf.setFont(font, 'bold')
-          pdf.setFontSize(8)
-          pdf.text(cert.name || '', mainX, y)
-          pdf.setFont(font, 'normal')
-          let extra = ''
-          if (cert.issuer) extra += ` - ${cert.issuer}`
-          if (cert.date) extra += ` (${cert.date})`
-          if (extra) pdf.text(extra, mainX + pdf.getTextWidth(cert.name || ''), y)
-          y += 4
-        })
-      }
+      order.filter(s => s !== 'skills').forEach(s => addCreativeSection(s))
 
     } else if (template === 'technical') {
       // Technical: colored section headers
@@ -1228,12 +1278,7 @@ export default async function handler(req, res) {
       pdf.setTextColor(0, 0, 0)
       y += 8
 
-      addSummary(addSectionTechnical)
-      addExperience(addSectionTechnical)
-      addEducation(addSectionTechnical)
-      addSkills(addSectionTechnical)
-      addProjects(addSectionTechnical)
-      addCertifications(addSectionTechnical)
+      runSections(addSectionTechnical)
 
     } else if (template === 'compact') {
       // Compact: tight spacing
@@ -1252,12 +1297,7 @@ export default async function handler(req, res) {
       pdf.setTextColor(0, 0, 0)
       y += 6
 
-      addSummary(addSectionCompact)
-      addExperience(addSectionCompact)
-      addEducation(addSectionCompact)
-      addSkills(addSectionCompact)
-      addProjects(addSectionCompact)
-      addCertifications(addSectionCompact)
+      runSections(addSectionCompact)
 
     } else if (template === 'classic') {
       // Classic: centered, formal
@@ -1275,12 +1315,7 @@ export default async function handler(req, res) {
       pdf.setTextColor(0, 0, 0)
       y += 8
 
-      addSummary(addSectionClassic)
-      addExperience(addSectionClassic)
-      addEducation(addSectionClassic)
-      addSkills(addSectionClassic)
-      addProjects(addSectionClassic)
-      addCertifications(addSectionClassic)
+      runSections(addSectionClassic)
 
     } else if (template === 'minimal') {
       // Minimal: clean, left-aligned, light headers
@@ -1299,12 +1334,7 @@ export default async function handler(req, res) {
       pdf.setTextColor(0, 0, 0)
       y += 8
 
-      addSummary(addSectionMinimal)
-      addExperience(addSectionMinimal)
-      addEducation(addSectionMinimal)
-      addSkills(addSectionMinimal)
-      addProjects(addSectionMinimal)
-      addCertifications(addSectionMinimal)
+      runSections(addSectionMinimal)
 
     } else if (template === 'executive') {
       // Executive: formal with colored header border
@@ -1324,12 +1354,7 @@ export default async function handler(req, res) {
       pdf.setTextColor(0, 0, 0)
       y += 8
 
-      addSummary(addSectionExecutive)
-      addExperience(addSectionExecutive)
-      addEducation(addSectionExecutive)
-      addSkills(addSectionExecutive)
-      addProjects(addSectionExecutive)
-      addCertifications(addSectionExecutive)
+      runSections(addSectionExecutive)
 
     } else if (template === 'modern') {
       // Modern: bold title with centered layout
@@ -1347,12 +1372,7 @@ export default async function handler(req, res) {
       pdf.text([resumeData.personal.email, resumeData.personal.phone, resumeData.personal.location, resumeData.personal.linkedin].filter(Boolean).join(' | '), pdfWidth / 2, y, { align: 'center' })
       y += 10
 
-      addSummary(addSectionModern)
-      addExperience(addSectionModern)
-      addEducation(addSectionModern)
-      addSkills(addSectionModern)
-      addProjects(addSectionModern)
-      addCertifications(addSectionModern)
+      runSections(addSectionModern)
 
     } else {
       // Default: Modern (fallback)
@@ -1370,12 +1390,7 @@ export default async function handler(req, res) {
       pdf.text([resumeData.personal.email, resumeData.personal.phone, resumeData.personal.location, resumeData.personal.linkedin].filter(Boolean).join(' | '), pdfWidth / 2, y, { align: 'center' })
       y += 10
 
-      addSummary(addSectionModern)
-      addExperience(addSectionModern)
-      addEducation(addSectionModern)
-      addSkills(addSectionModern)
-      addProjects(addSectionModern)
-      addCertifications(addSectionModern)
+      runSections(addSectionModern)
     }
 
     const pdfBuffer = Buffer.from(pdf.output('arraybuffer'))

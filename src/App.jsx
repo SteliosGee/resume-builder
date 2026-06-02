@@ -211,6 +211,7 @@ function AppContent() {
           accentColor,
           template,
           fontFamily,
+          sectionOrder,
         }),
       })
 
