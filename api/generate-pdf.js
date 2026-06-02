@@ -21,225 +21,669 @@ function generateDocx(resumeData, accentColor, template, fontFamily) {
   const font = fontFamily || 'Calibri'
   const color = accentColor.replace('#', '')
 
-  const children = []
+  // Each template gets completely different structure
+  if (template === 'compact') return generateDocxCompact(resumeData, color, font)
+  if (template === 'minimal') return generateDocxMinimal(resumeData, color, font)
+  if (template === 'creative') return generateDocxCreative(resumeData, color, font)
+  if (template === 'technical') return generateDocxTechnical(resumeData, color, font)
+  if (template === 'executive') return generateDocxExecutive(resumeData, color, font)
+  if (template === 'classic') return generateDocxClassic(resumeData, color, font)
+  return generateDocxModern(resumeData, color, font)
+}
 
-  // Template-specific configuration
-  const headerAlign = ['classic', 'executive', 'modern'].includes(template) ? AlignmentType.CENTER : AlignmentType.LEFT
-  
-  // Template-specific sizing
-  let nameSize, titleSize, bodySize, sectionSize, titleColor, titleBold
-  
-  if (template === 'compact') {
-    nameSize = 40
-    titleSize = 22
-    bodySize = 18
-    sectionSize = 20
-    titleColor = '000000'
-    titleBold = false
-  } else if (template === 'minimal') {
-    nameSize = 44
-    titleSize = 24
-    bodySize = 20
-    sectionSize = 22
-    titleColor = '888888'
-    titleBold = false
-  } else if (template === 'creative') {
-    nameSize = 44
-    titleSize = 26
-    bodySize = 20
-    sectionSize = 22
-    titleColor = color
-    titleBold = true
-  } else if (template === 'technical') {
-    nameSize = 52
-    titleSize = 28
-    bodySize = 20
-    sectionSize = 22
-    titleColor = color
-    titleBold = true
-  } else if (template === 'executive') {
-    nameSize = 52
-    titleSize = 28
-    bodySize = 20
-    sectionSize = 22
-    titleColor = '000000'
-    titleBold = false
-  } else if (template === 'classic') {
-    nameSize = 52
-    titleSize = 26
-    bodySize = 20
-    sectionSize = 22
-    titleColor = '000000'
-    titleBold = false
-  } else { // modern (default)
-    nameSize = 52
-    titleSize = 28
-    bodySize = 20
-    sectionSize = 22
-    titleColor = color
-    titleBold = true
-  }
+function buildDocx(children, margins) {
+  return new Document({
+    sections: [{
+      properties: {
+        page: {
+          margin: margins || { top: 720, bottom: 720, left: 720, right: 720 },
+        },
+      },
+      children,
+    }],
+  })
+}
 
-  // Helper to create section header based on template
-  const createSectionHeader = (title) => {
-    let borderStyle, headerColor
-    
-    if (template === 'classic') {
-      borderStyle = { bottom: { color: '333333', style: BorderStyle.SINGLE, size: 2 } }
-      headerColor = '000000'
-    } else if (template === 'executive') {
-      borderStyle = { bottom: { color, style: BorderStyle.SINGLE, size: 3 } }
-      headerColor = '000000'
-    } else if (template === 'minimal') {
-      borderStyle = {}
-      headerColor = '888888'
-    } else if (template === 'compact') {
-      borderStyle = { bottom: { color: '333333', style: BorderStyle.SINGLE, size: 1 } }
-      headerColor = '000000'
-    } else if (template === 'technical') {
-      borderStyle = { top: { color, style: BorderStyle.SINGLE, size: 2 } }
-      headerColor = color
-    } else if (template === 'creative') {
-      borderStyle = { bottom: { color, style: BorderStyle.DOUBLE, size: 1 } }
-      headerColor = color
-    } else { // modern
-      borderStyle = { bottom: { color, style: BorderStyle.SINGLE, size: 1 } }
-      headerColor = color
-    }
+function contactLine(personal, size, font, color) {
+  return new Paragraph({
+    children: [new TextRun({
+      text: [personal.email, personal.phone, personal.location, personal.linkedin].filter(Boolean).join(' | '),
+      size, font, color: color || '000000',
+    })],
+    alignment: AlignmentType.CENTER,
+    spacing: { after: 200 },
+  })
+}
 
-    return new Paragraph({
-      children: [new TextRun({ text: title.toUpperCase(), bold: true, size: sectionSize, color: headerColor, font })],
-      spacing: { before: 200, after: 80 },
-      border: borderStyle,
-    })
-  }
-
-  // Header
-  children.push(
-    new Paragraph({
-      children: [new TextRun({ text: personal.name || 'Your Name', bold: true, size: nameSize, font })],
-      alignment: headerAlign,
-      spacing: { after: 80 },
-    }),
-    new Paragraph({
-      children: [new TextRun({ text: personal.title || 'Your Title', size: titleSize, bold: titleBold, color: titleColor, font })],
-      alignment: headerAlign,
-      spacing: { after: 80 },
-    }),
-    new Paragraph({
-      children: [new TextRun({
-        text: [personal.email, personal.phone, personal.location, personal.linkedin].filter(Boolean).join(' | '),
-        size: bodySize - 2,
-        font,
-        color: template === 'minimal' ? '666666' : '000000'
-      })],
-      alignment: headerAlign,
-      spacing: { after: 200 },
-    })
-  )
-
-  // Summary
-  if (summary) {
-    children.push(createSectionHeader('Professional Summary'))
+function addExperience(experience, children, bodySize, font, bulletChar, indent, beforeSpacing) {
+  if (!experience || experience.length === 0 || !experience[0].title) return
+  experience.forEach((exp) => {
+    const dateStr = exp.current ? `${exp.startDate} - Present` : `${exp.startDate} - ${exp.endDate}`
     children.push(
       new Paragraph({
-        children: [new TextRun({ text: summary, size: bodySize, font })],
-        spacing: { after: 150 },
+        children: [
+          new TextRun({ text: exp.title || '', bold: true, size: bodySize, font }),
+          new TextRun({ text: `\t${dateStr}`, size: bodySize, font }),
+        ],
+        tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
+        spacing: { before: beforeSpacing || 100 },
+      }),
+      new Paragraph({
+        children: [new TextRun({ text: `${exp.company || ''}${exp.location ? ', ' + exp.location : ''}`, italics: true, size: bodySize, font })],
+        spacing: { after: 60 },
       })
     )
+    if (exp.bullets) {
+      exp.bullets.forEach((bullet) => {
+        if (bullet) {
+          children.push(new Paragraph({
+            children: [new TextRun({ text: `${bulletChar} ${bullet}`, size: bodySize, font })],
+            indent: { left: indent || 720 },
+            spacing: { after: 30 },
+          }))
+        }
+      })
+    }
+  })
+}
+
+function addEducation(education, children, bodySize, font) {
+  if (!education || education.length === 0 || !education[0].degree) return
+  education.forEach((edu) => {
+    children.push(
+      new Paragraph({
+        children: [
+          new TextRun({ text: edu.degree || '', bold: true, size: bodySize, font }),
+          new TextRun({ text: `\t${edu.startDate} - ${edu.endDate}`, size: bodySize, font }),
+        ],
+        tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
+        spacing: { before: 100 },
+      }),
+      new Paragraph({
+        children: [new TextRun({ text: edu.school || '', italics: true, size: bodySize, font })],
+        spacing: { after: 80 },
+      })
+    )
+  })
+}
+
+function addProjects(projects, children, bodySize, font, bulletChar) {
+  if (!projects || projects.length === 0 || !projects[0].name) return
+  projects.forEach((proj) => {
+    children.push(
+      new Paragraph({
+        children: [
+          new TextRun({ text: proj.name || '', bold: true, size: bodySize, font }),
+          new TextRun({ text: proj.url ? ` - ${proj.url}` : '', size: bodySize, font, color: '0563C1' }),
+        ],
+        spacing: { before: 80 },
+      })
+    )
+    if (proj.description) {
+      children.push(new Paragraph({
+        children: [new TextRun({ text: proj.description, size: bodySize, font })],
+        spacing: { after: 30 },
+      }))
+    }
+  })
+}
+
+function addCertifications(certifications, children, bodySize, font) {
+  if (!certifications || certifications.length === 0 || !certifications[0].name) return
+  certifications.forEach((cert) => {
+    children.push(new Paragraph({
+      children: [
+        new TextRun({ text: `${cert.name || ''}`, bold: true, size: bodySize, font }),
+        new TextRun({ text: cert.issuer ? ` - ${cert.issuer}` : '', size: bodySize, font }),
+        new TextRun({ text: cert.date ? ` (${cert.date})` : '', size: bodySize, font }),
+      ],
+      spacing: { after: 40 },
+    }))
+  })
+}
+
+function sectionHeaderModern(title, sectionSize, color, font) {
+  return new Paragraph({
+    children: [new TextRun({ text: title.toUpperCase(), bold: true, size: sectionSize, color, font })],
+    spacing: { before: 200, after: 80 },
+    border: { bottom: { color, style: BorderStyle.SINGLE, size: 1 } },
+  })
+}
+
+function generateDocxModern(resumeData, color, font) {
+  const { personal, summary, experience, education, skills, projects, certifications } = resumeData
+  const children = []
+
+  children.push(
+    new Paragraph({ children: [new TextRun({ text: personal.name || 'Your Name', bold: true, size: 52, font })], alignment: AlignmentType.CENTER, spacing: { after: 80 } }),
+    new Paragraph({ children: [new TextRun({ text: personal.title || 'Your Title', size: 28, bold: true, color, font })], alignment: AlignmentType.CENTER, spacing: { after: 80 } }),
+    contactLine(personal, 18, font),
+  )
+
+  if (summary) {
+    children.push(sectionHeaderModern('Professional Summary', 22, color, font))
+    children.push(new Paragraph({ children: [new TextRun({ text: summary, size: 20, font })], spacing: { after: 150 } }))
   }
 
-  // Experience
   if (experience && experience.length > 0 && experience[0].title) {
-    children.push(createSectionHeader('Work Experience'))
+    children.push(sectionHeaderModern('Work Experience', 22, color, font))
+    addExperience(experience, children, 20, font, '•')
+  }
 
+  if (education && education.length > 0 && education[0].degree) {
+    children.push(sectionHeaderModern('Education', 22, color, font))
+    addEducation(education, children, 20, font)
+  }
+
+  if (skills && skills.length > 0 && skills[0].category) {
+    children.push(sectionHeaderModern('Skills', 22, color, font))
+    skills.forEach((skill) => {
+      if (skill.category && skill.items && skill.items.length > 0) {
+        children.push(new Paragraph({
+          children: [
+            new TextRun({ text: `${skill.category}: `, bold: true, size: 20, font }),
+            new TextRun({ text: skill.items.join(', '), size: 20, font }),
+          ],
+          spacing: { after: 60 },
+        }))
+      }
+    })
+  }
+
+  addProjects(projects, children, 20, font)
+  addCertifications(certifications, children, 20, font)
+  return buildDocx(children)
+}
+
+function sectionHeaderClassic(title, sectionSize, font) {
+  return new Paragraph({
+    children: [new TextRun({ text: title.toUpperCase(), bold: true, size: sectionSize, color: '000000', font })],
+    spacing: { before: 240, after: 80 },
+    border: { bottom: { color: '333333', style: BorderStyle.SINGLE, size: 2 } },
+  })
+}
+
+function generateDocxClassic(resumeData, color, font) {
+  const { personal, summary, experience, education, skills, projects, certifications } = resumeData
+  const children = []
+
+  children.push(
+    new Paragraph({ children: [new TextRun({ text: personal.name || 'Your Name', bold: true, size: 52, font })], alignment: AlignmentType.CENTER, spacing: { after: 80 } }),
+    new Paragraph({ children: [new TextRun({ text: personal.title || 'Your Title', size: 26, font })], alignment: AlignmentType.CENTER, spacing: { after: 80 } }),
+    contactLine(personal, 18, font),
+    new Paragraph({ children: [], border: { bottom: { color: '333333', style: BorderStyle.DOUBLE, size: 4 } }, spacing: { after: 200 } }),
+  )
+
+  if (summary) {
+    children.push(sectionHeaderClassic('Professional Summary', 22, font))
+    children.push(new Paragraph({ children: [new TextRun({ text: summary, size: 20, font })], spacing: { after: 150 } }))
+  }
+
+  if (experience && experience.length > 0 && experience[0].title) {
+    children.push(sectionHeaderClassic('Work Experience', 22, font))
+    addExperience(experience, children, 20, font, '•')
+  }
+
+  if (education && education.length > 0 && education[0].degree) {
+    children.push(sectionHeaderClassic('Education', 22, font))
+    addEducation(education, children, 20, font)
+  }
+
+  if (skills && skills.length > 0 && skills[0].category) {
+    children.push(sectionHeaderClassic('Skills', 22, font))
+    skills.forEach((skill) => {
+      if (skill.category && skill.items && skill.items.length > 0) {
+        children.push(new Paragraph({
+          children: [
+            new TextRun({ text: `${skill.category}: `, bold: true, size: 20, font }),
+            new TextRun({ text: skill.items.join(', '), size: 20, font }),
+          ],
+          spacing: { after: 60 },
+        }))
+      }
+    })
+  }
+
+  addProjects(projects, children, 20, font)
+  addCertifications(certifications, children, 20, font)
+  return buildDocx(children)
+}
+
+function sectionHeaderMinimal(title, sectionSize, font) {
+  return new Paragraph({
+    children: [new TextRun({ text: title.toUpperCase(), size: sectionSize, color: '999999', font })],
+    spacing: { before: 280, after: 100 },
+  })
+}
+
+function generateDocxMinimal(resumeData, color, font) {
+  const { personal, summary, experience, education, skills, projects, certifications } = resumeData
+  const children = []
+
+  children.push(
+    new Paragraph({ children: [new TextRun({ text: personal.name || 'Your Name', bold: true, size: 44, color: '333333', font })], alignment: AlignmentType.LEFT, spacing: { after: 80 } }),
+    new Paragraph({ children: [new TextRun({ text: personal.title || 'Your Title', size: 24, color: '888888', font })], alignment: AlignmentType.LEFT, spacing: { after: 100 } }),
+    new Paragraph({
+      children: [new TextRun({
+        text: [personal.email, personal.phone, personal.location, personal.linkedin].filter(Boolean).join('  ·  '),
+        size: 16, font, color: '888888',
+      })],
+      alignment: AlignmentType.LEFT,
+      spacing: { after: 200 },
+    }),
+  )
+
+  if (summary) {
+    children.push(sectionHeaderMinimal('About', 20, font))
+    children.push(new Paragraph({ children: [new TextRun({ text: summary, size: 18, color: '444444', font })], spacing: { after: 150 } }))
+  }
+
+  if (experience && experience.length > 0 && experience[0].title) {
+    children.push(sectionHeaderMinimal('Experience', 20, font))
     experience.forEach((exp) => {
       const dateStr = exp.current ? `${exp.startDate} - Present` : `${exp.startDate} - ${exp.endDate}`
       children.push(
         new Paragraph({
           children: [
-            new TextRun({ text: exp.title || '', bold: true, size: bodySize, font }),
-            new TextRun({ text: `\t${dateStr}`, size: bodySize, font }),
+            new TextRun({ text: exp.title || '', bold: true, size: 18, color: '333333', font }),
           ],
-          tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
-          spacing: { before: 100 },
+          spacing: { before: 80 },
         }),
         new Paragraph({
-          children: [new TextRun({ text: `${exp.company || ''}${exp.location ? ', ' + exp.location : ''}`, italics: true, size: bodySize, font })],
-          spacing: { after: 60 },
+          children: [
+            new TextRun({ text: `${exp.company || ''}${exp.location ? ', ' + exp.location : ''}`, size: 18, color: '666666', font }),
+            new TextRun({ text: `\t${dateStr}`, size: 16, color: '999999', font }),
+          ],
+          tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
+          spacing: { after: 40 },
         })
       )
-
-      if (exp.bullets && exp.bullets.length > 0) {
+      if (exp.bullets) {
         exp.bullets.forEach((bullet) => {
           if (bullet) {
-            children.push(
-              new Paragraph({
-                children: [new TextRun({ text: `• ${bullet}`, size: bodySize, font })],
-                indent: { left: 720 },
-                spacing: { after: 30 },
-              })
-            )
+            children.push(new Paragraph({
+              children: [new TextRun({ text: bullet, size: 18, color: '444444', font })],
+              indent: { left: 360 },
+              spacing: { after: 20 },
+            }))
           }
         })
       }
     })
   }
 
-  // Education
   if (education && education.length > 0 && education[0].degree) {
-    children.push(createSectionHeader('Education'))
-
+    children.push(sectionHeaderMinimal('Education', 20, font))
     education.forEach((edu) => {
-      const dateStr = `${edu.startDate} - ${edu.endDate}`
       children.push(
         new Paragraph({
-          children: [
-            new TextRun({ text: edu.degree || '', bold: true, size: bodySize, font }),
-            new TextRun({ text: `\t${dateStr}`, size: bodySize, font }),
-          ],
-          tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
-          spacing: { before: 100 },
+          children: [new TextRun({ text: edu.degree || '', bold: true, size: 18, color: '333333', font })],
+          spacing: { before: 80 },
         }),
         new Paragraph({
-          children: [new TextRun({ text: edu.school || '', italics: true, size: bodySize, font })],
-          spacing: { after: 80 },
+          children: [
+            new TextRun({ text: edu.school || '', size: 18, color: '666666', font }),
+            new TextRun({ text: `\t${edu.startDate} - ${edu.endDate}`, size: 16, color: '999999', font }),
+          ],
+          tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
+          spacing: { after: 60 },
         })
       )
     })
   }
 
-  // Skills
   if (skills && skills.length > 0 && skills[0].category) {
-    children.push(createSectionHeader('Skills'))
-
+    children.push(sectionHeaderMinimal('Skills', 20, font))
     skills.forEach((skill) => {
       if (skill.category && skill.items && skill.items.length > 0) {
-        children.push(
-          new Paragraph({
-            children: [
-              new TextRun({ text: `${skill.category}: `, bold: true, size: bodySize, font }),
-              new TextRun({ text: skill.items.join(', '), size: bodySize, font }),
-            ],
-            spacing: { after: 60 },
-          })
-        )
+        children.push(new Paragraph({
+          children: [
+            new TextRun({ text: `${skill.category}`, bold: true, size: 18, color: '666666', font }),
+            new TextRun({ text: `  ${skill.items.join(' · ')}`, size: 18, color: '444444', font }),
+          ],
+          spacing: { after: 40 },
+        }))
       }
     })
   }
 
-  const doc = new Document({
-    sections: [{
-      properties: {
-        page: {
-          margin: { top: 720, bottom: 720, left: 720, right: 720 },
-        },
-      },
-      children,
-    }],
-  })
+  addProjects(projects, children, 18, font, '→')
+  addCertifications(certifications, children, 18, font)
+  return buildDocx(children, { top: 900, bottom: 900, left: 900, right: 900 })
+}
 
-  return doc
+function sectionHeaderExecutive(title, sectionSize, color, font) {
+  return new Paragraph({
+    children: [new TextRun({ text: title.toUpperCase(), bold: true, size: sectionSize, color: '000000', font })],
+    spacing: { before: 240, after: 80 },
+    border: { bottom: { color, style: BorderStyle.SINGLE, size: 3 } },
+  })
+}
+
+function generateDocxExecutive(resumeData, color, font) {
+  const { personal, summary, experience, education, skills, projects, certifications } = resumeData
+  const children = []
+
+  children.push(
+    new Paragraph({ children: [], spacing: { after: 60 }, border: { bottom: { color: '333333', style: BorderStyle.SINGLE, size: 6 } } }),
+    new Paragraph({ children: [new TextRun({ text: personal.name || 'Your Name', bold: true, size: 56, font, color: '1a1a1a' })], alignment: AlignmentType.CENTER, spacing: { before: 100, after: 60 } }),
+    new Paragraph({ children: [new TextRun({ text: personal.title || 'Your Title', size: 26, font, color: '444444' })], alignment: AlignmentType.CENTER, spacing: { after: 60 } }),
+    contactLine(personal, 18, font, '444444'),
+    new Paragraph({ children: [], spacing: { after: 200 }, border: { bottom: { color: '333333', style: BorderStyle.SINGLE, size: 6 } } }),
+  )
+
+  if (summary) {
+    children.push(sectionHeaderExecutive('Executive Summary', 22, color, font))
+    children.push(new Paragraph({ children: [new TextRun({ text: summary, size: 20, font })], spacing: { after: 150 } }))
+  }
+
+  if (experience && experience.length > 0 && experience[0].title) {
+    children.push(sectionHeaderExecutive('Professional Experience', 22, color, font))
+    addExperience(experience, children, 20, font, '▸', 720)
+  }
+
+  if (education && education.length > 0 && education[0].degree) {
+    children.push(sectionHeaderExecutive('Education', 22, color, font))
+    addEducation(education, children, 20, font)
+  }
+
+  if (skills && skills.length > 0 && skills[0].category) {
+    children.push(sectionHeaderExecutive('Core Competencies', 22, color, font))
+    skills.forEach((skill) => {
+      if (skill.category && skill.items && skill.items.length > 0) {
+        children.push(new Paragraph({
+          children: [
+            new TextRun({ text: `${skill.category}: `, bold: true, size: 20, font }),
+            new TextRun({ text: skill.items.join('  |  '), size: 20, font }),
+          ],
+          spacing: { after: 60 },
+        }))
+      }
+    })
+  }
+
+  addProjects(projects, children, 20, font)
+  addCertifications(certifications, children, 20, font)
+  return buildDocx(children)
+}
+
+function sectionHeaderCreative(title, sectionSize, color, font) {
+  return new Paragraph({
+    children: [new TextRun({ text: title.toUpperCase(), bold: true, size: sectionSize, color, font })],
+    spacing: { before: 240, after: 100 },
+    border: { bottom: { color, style: BorderStyle.DOUBLE, size: 1 } },
+  })
+}
+
+function generateDocxCreative(resumeData, color, font) {
+  const { personal, summary, experience, education, skills, projects, certifications } = resumeData
+  const children = []
+
+  children.push(
+    new Paragraph({ children: [new TextRun({ text: personal.name || 'Your Name', bold: true, size: 48, font, color })], alignment: AlignmentType.LEFT, spacing: { after: 40 } }),
+    new Paragraph({ children: [new TextRun({ text: personal.title || 'Your Title', size: 26, font, color })], alignment: AlignmentType.LEFT, spacing: { after: 100 } }),
+    new Paragraph({
+      children: [new TextRun({
+        text: [personal.email, personal.phone, personal.location, personal.linkedin].filter(Boolean).join('  ✦  '),
+        size: 16, font, color: '666666',
+      })],
+      alignment: AlignmentType.LEFT,
+      spacing: { after: 200 },
+    }),
+    new Paragraph({ children: [], border: { bottom: { color, style: BorderStyle.DOUBLE, size: 1 } }, spacing: { after: 200 } }),
+  )
+
+  if (summary) {
+    children.push(sectionHeaderCreative('About Me', 22, color, font))
+    children.push(new Paragraph({ children: [new TextRun({ text: summary, size: 20, font })], spacing: { after: 150 } }))
+  }
+
+  if (experience && experience.length > 0 && experience[0].title) {
+    children.push(sectionHeaderCreative('Experience', 22, color, font))
+    experience.forEach((exp) => {
+      const dateStr = exp.current ? `${exp.startDate} - Present` : `${exp.startDate} - ${exp.endDate}`
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: exp.title || '', bold: true, size: 20, font, color }),
+            new TextRun({ text: `\t${dateStr}`, size: 18, font, color: '888888' }),
+          ],
+          tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
+          spacing: { before: 100 },
+        }),
+        new Paragraph({
+          children: [new TextRun({ text: `${exp.company || ''}${exp.location ? ', ' + exp.location : ''}`, italics: true, size: 18, font, color: '555555' })],
+          spacing: { after: 60 },
+        })
+      )
+      if (exp.bullets) {
+        exp.bullets.forEach((bullet) => {
+          if (bullet) {
+            children.push(new Paragraph({
+              children: [new TextRun({ text: `◆  ${bullet}`, size: 18, font })],
+              indent: { left: 480 },
+              spacing: { after: 30 },
+            }))
+          }
+        })
+      }
+    })
+  }
+
+  if (education && education.length > 0 && education[0].degree) {
+    children.push(sectionHeaderCreative('Education', 22, color, font))
+    education.forEach((edu) => {
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: edu.degree || '', bold: true, size: 20, font }),
+            new TextRun({ text: `\t${edu.startDate} - ${edu.endDate}`, size: 18, font, color: '888888' }),
+          ],
+          tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
+          spacing: { before: 80 },
+        }),
+        new Paragraph({
+          children: [new TextRun({ text: edu.school || '', italics: true, size: 18, font, color: '555555' })],
+          spacing: { after: 60 },
+        })
+      )
+    })
+  }
+
+  if (skills && skills.length > 0 && skills[0].category) {
+    children.push(sectionHeaderCreative('Skills', 22, color, font))
+    skills.forEach((skill) => {
+      if (skill.category && skill.items && skill.items.length > 0) {
+        children.push(new Paragraph({
+          children: [
+            new TextRun({ text: `${skill.category}: `, bold: true, size: 20, font, color }),
+            new TextRun({ text: skill.items.join('  •  '), size: 20, font }),
+          ],
+          spacing: { after: 60 },
+        }))
+      }
+    })
+  }
+
+  addProjects(projects, children, 20, font, '◆')
+  addCertifications(certifications, children, 20, font)
+  return buildDocx(children)
+}
+
+function sectionHeaderTechnical(title, sectionSize, color, font) {
+  return new Paragraph({
+    children: [new TextRun({ text: title.toUpperCase(), bold: true, size: sectionSize, color, font })],
+    spacing: { before: 200, after: 80 },
+    border: { top: { color, style: BorderStyle.SINGLE, size: 2 } },
+  })
+}
+
+function generateDocxTechnical(resumeData, color, font) {
+  const { personal, summary, experience, education, skills, projects, certifications } = resumeData
+  const children = []
+
+  children.push(
+    new Paragraph({ children: [new TextRun({ text: personal.name || 'Your Name', bold: true, size: 52, font })], alignment: AlignmentType.LEFT, spacing: { after: 60 } }),
+    new Paragraph({ children: [new TextRun({ text: personal.title || 'Your Title', size: 26, font, color, bold: true })], alignment: AlignmentType.LEFT, spacing: { after: 80 } }),
+    new Paragraph({
+      children: [new TextRun({
+        text: [personal.email, personal.phone, personal.location, personal.linkedin].filter(Boolean).join(' | '),
+        size: 18, font, color: '555555',
+      })],
+      alignment: AlignmentType.LEFT,
+      spacing: { after: 60 },
+    }),
+    new Paragraph({ children: [], border: { bottom: { color, style: BorderStyle.SINGLE, size: 2 } }, spacing: { after: 200 } }),
+  )
+
+  if (summary) {
+    children.push(sectionHeaderTechnical('Summary', 22, color, font))
+    children.push(new Paragraph({ children: [new TextRun({ text: summary, size: 20, font })], spacing: { after: 150 } }))
+  }
+
+  if (skills && skills.length > 0 && skills[0].category) {
+    children.push(sectionHeaderTechnical('Technical Skills', 22, color, font))
+    skills.forEach((skill) => {
+      if (skill.category && skill.items && skill.items.length > 0) {
+        children.push(new Paragraph({
+          children: [
+            new TextRun({ text: `${skill.category}: `, bold: true, size: 20, font }),
+            new TextRun({ text: skill.items.join(' | '), size: 20, font }),
+          ],
+          indent: { left: 360 },
+          spacing: { after: 40 },
+        }))
+      }
+    })
+  }
+
+  if (experience && experience.length > 0 && experience[0].title) {
+    children.push(sectionHeaderTechnical('Experience', 22, color, font))
+    addExperience(experience, children, 20, font, '▸', 480)
+  }
+
+  if (projects && projects.length > 0 && projects[0].name) {
+    children.push(sectionHeaderTechnical('Projects', 22, color, font))
+    projects.forEach((proj) => {
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: proj.name || '', bold: true, size: 20, font }),
+            new TextRun({ text: proj.url ? ` - ${proj.url}` : '', size: 18, font, color: '0563C1' }),
+          ],
+          spacing: { before: 80 },
+        })
+      )
+      if (proj.description) {
+        children.push(new Paragraph({
+          children: [new TextRun({ text: proj.description, size: 20, font })],
+          spacing: { after: 30 },
+        }))
+      }
+    })
+  }
+
+  if (education && education.length > 0 && education[0].degree) {
+    children.push(sectionHeaderTechnical('Education', 22, color, font))
+    addEducation(education, children, 20, font)
+  }
+
+  addCertifications(certifications, children, 20, font)
+  return buildDocx(children)
+}
+
+function sectionHeaderCompact(title, sectionSize, font) {
+  return new Paragraph({
+    children: [new TextRun({ text: title.toUpperCase(), bold: true, size: sectionSize, color: '333333', font })],
+    spacing: { before: 160, after: 60 },
+    border: { bottom: { color: 'cccccc', style: BorderStyle.SINGLE, size: 1 } },
+  })
+}
+
+function generateDocxCompact(resumeData, color, font) {
+  const { personal, summary, experience, education, skills, projects, certifications } = resumeData
+  const children = []
+
+  const contactParts = [personal.email, personal.phone, personal.location, personal.linkedin].filter(Boolean)
+  children.push(
+    new Paragraph({
+      children: [
+        new TextRun({ text: personal.name || 'Your Name', bold: true, size: 40, font }),
+        new TextRun({ text: `   |   ${personal.title || 'Your Title'}`, size: 20, font, color: '666666' }),
+        new TextRun({ text: `   |   ${contactParts.join('   |   ')}`, size: 16, font, color: '888888' }),
+      ],
+      alignment: AlignmentType.LEFT,
+      spacing: { after: 60 },
+    }),
+    new Paragraph({ children: [], border: { bottom: { color: '333333', style: BorderStyle.SINGLE, size: 1 } }, spacing: { after: 160 } }),
+  )
+
+  if (summary) {
+    children.push(new Paragraph({ children: [new TextRun({ text: summary, size: 18, font })], spacing: { after: 100 } }))
+  }
+
+  if (experience && experience.length > 0 && experience[0].title) {
+    children.push(sectionHeaderCompact('Experience', 18, font))
+    experience.forEach((exp) => {
+      const dateStr = exp.current ? `${exp.startDate} - Present` : `${exp.startDate} - ${exp.endDate}`
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: `${exp.title || ''}`, bold: true, size: 18, font }),
+            new TextRun({ text: ` at ${exp.company || ''}${exp.location ? ', ' + exp.location : ''}`, size: 18, font }),
+            new TextRun({ text: `\t${dateStr}`, size: 16, font, color: '888888' }),
+          ],
+          tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
+          spacing: { before: 60 },
+        })
+      )
+      if (exp.bullets) {
+        exp.bullets.forEach((bullet) => {
+          if (bullet) {
+            children.push(new Paragraph({
+              children: [new TextRun({ text: `- ${bullet}`, size: 18, font })],
+              indent: { left: 360 },
+              spacing: { after: 20 },
+            }))
+          }
+        })
+      }
+    })
+  }
+
+  if (education && education.length > 0 && education[0].degree) {
+    children.push(sectionHeaderCompact('Education', 18, font))
+    education.forEach((edu) => {
+      children.push(new Paragraph({
+        children: [
+          new TextRun({ text: edu.degree || '', bold: true, size: 18, font }),
+          new TextRun({ text: `, ${edu.school || ''}`, size: 18, font }),
+          new TextRun({ text: `\t${edu.startDate} - ${edu.endDate}`, size: 16, font, color: '888888' }),
+        ],
+        tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
+        spacing: { after: 40 },
+      }))
+    })
+  }
+
+  if (skills && skills.length > 0 && skills[0].category) {
+    children.push(sectionHeaderCompact('Skills', 18, font))
+    skills.forEach((skill) => {
+      if (skill.category && skill.items && skill.items.length > 0) {
+        children.push(new Paragraph({
+          children: [
+            new TextRun({ text: `${skill.category}: `, bold: true, size: 18, font }),
+            new TextRun({ text: skill.items.join(', '), size: 18, font }),
+          ],
+          spacing: { after: 30 },
+        }))
+      }
+    })
+  }
+
+  addProjects(projects, children, 18, font, '-')
+  addCertifications(certifications, children, 18, font)
+  return buildDocx(children, { top: 600, bottom: 600, left: 600, right: 600 })
 }
 
 export default async function handler(req, res) {
