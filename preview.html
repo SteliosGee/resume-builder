@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Preview</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f0f0; padding: 40px; }
+    .container { max-width: 800px; margin: 0 auto; display: flex; gap: 20px; flex-wrap: wrap; }
+    .preview-card {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      width: 100%;
+    }
+    h1 { color: #333; font-size: 2rem; margin-bottom: 5px; }
+    .subtitle { color: #667eea; font-size: 1.1rem; margin-bottom: 15px; }
+    .contact { display: flex; flex-wrap: wrap; gap: 15px; color: #666; font-size: 0.9rem; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; }
+    .section { margin-bottom: 25px; }
+    .section h2 { color: #667eea; font-size: 1.2rem; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 2px solid #667eea; }
+    .item { margin-bottom: 15px; }
+    .item h3 { color: #333; font-size: 1.1rem; margin-bottom: 3px; }
+    .item .date { color: #667eea; font-size: 0.9rem; margin-bottom: 5px; }
+    .item p { color: #555; line-height: 1.6; }
+    .skills { display: flex; flex-wrap: wrap; gap: 10px; }
+    .skill-tag { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.9rem; }
+    .form-side {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      flex: 1;
+      min-width: 300px;
+    }
+    .form-side h2 { color: #333; margin-bottom: 20px; font-size: 1.3rem; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; color: #555; font-weight: 600; font-size: 0.9rem; }
+    .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 0.95rem; }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; }
+    .form-group textarea { min-height: 80px; resize: vertical; }
+    .section-label { font-size: 0.95rem; color: #667eea; margin: 15px 0 10px 0; font-weight: 600; }
+    .download-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600; margin-top: 10px; }
+    .header { text-align: center; padding: 20px; color: white; margin-bottom: 20px; }
+    .header h1 { font-size: 2.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); color: white; }
+    .header p { font-size: 1.1rem; opacity: 0.9; }
+    body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Resume Builder</h1>
+    <p>Create a professional resume in minutes</p>
+  </div>
+  <div class="container">
+    <div class="form-side">
+      <h2>Edit Your Resume</h2>
+      <div class="section-label">Personal Information</div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" value="John Doe" readonly>
+      </div>
+      <div class="form-group">
+        <label>Job Title</label>
+        <input type="text" value="Software Developer" readonly>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="text" value="john.doe@email.com" readonly>
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="text" value="+1 (555) 123-4567" readonly>
+      </div>
+      <div class="form-group">
+        <label>Location</label>
+        <input type="text" value="New York, NY" readonly>
+      </div>
+      <div class="section-label">Professional Summary</div>
+      <div class="form-group">
+        <textarea readonly>Passionate software developer with 5+ years of experience building web applications. Proficient in React, Node.js, and Python.</textarea>
+      </div>
+      <button class="download-btn">📥 Download PDF</button>
+    </div>
+    <div class="preview-card">
+      <h1>John Doe</h1>
+      <div class="subtitle">Software Developer</div>
+      <div class="contact">
+        <span>📧 john.doe@email.com</span>
+        <span>📱 +1 (555) 123-4567</span>
+        <span>📍 New York, NY</span>
+        <span>🔗 linkedin.com/in/johndoe</span>
+      </div>
+      <div class="section">
+        <h2>Professional Summary</h2>
+        <p>Passionate software developer with 5+ years of experience building web applications. Proficient in React, Node.js, and Python. Strong problem-solving skills and ability to work in agile teams.</p>
+      </div>
+      <div class="section">
+        <h2>Work Experience</h2>
+        <div class="item">
+          <h3>Senior Software Developer</h3>
+          <div class="date"><strong>Tech Corp</strong> • Jan 2022 - Present</div>
+          <p>Led development of microservices architecture, improving system performance by 40%. Mentored junior developers and conducted code reviews.</p>
+        </div>
+        <div class="item">
+          <h3>Software Developer</h3>
+          <div class="date"><strong>StartupXYZ</strong> • Jun 2019 - Dec 2021</div>
+          <p>Developed and maintained multiple React-based web applications. Collaborated with design team to implement responsive UI components.</p>
+        </div>
+      </div>
+      <div class="section">
+        <h2>Education</h2>
+        <div class="item">
+          <h3>Bachelor of Science in Computer Science</h3>
+          <div class="date"><strong>University of Technology</strong> • 2015 - 2019</div>
+          <p>Graduated with honors. Relevant coursework: Data Structures, Algorithms, Web Development.</p>
+        </div>
+      </div>
+      <div class="section">
+        <h2>Skills</h2>
+        <div class="skills">
+          <span class="skill-tag">JavaScript</span>
+          <span class="skill-tag">React</span>
+          <span class="skill-tag">Node.js</span>
+          <span class="skill-tag">Python</span>
+          <span class="skill-tag">SQL</span>
+          <span class="skill-tag">Git</span>
+          <span class="skill-tag">Docker</span>
+          <span class="skill-tag">AWS</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

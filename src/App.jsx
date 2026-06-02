@@ -1,0 +1,322 @@
+import { useState, useRef, useEffect } from 'react'
+import ResumeForm from './components/ResumeForm'
+import ResumePreview from './components/ResumePreview'
+import TemplateSelector from './components/TemplateSelector'
+import PaymentModal from './components/PaymentModal'
+
+const TEMPLATES = [
+  { id: 'modern', name: 'Modern', description: 'Clean design with accent colors' },
+  { id: 'classic', name: 'Classic', description: 'Traditional professional format' },
+  { id: 'minimal', name: 'Minimal', description: 'Simple and elegant' },
+]
+
+const defaultResumeData = {
+  personal: {
+    name: 'John Doe',
+    title: 'Senior Software Developer',
+    email: 'john.doe@email.com',
+    phone: '+1 (555) 123-4567',
+    location: 'New York, NY',
+    linkedin: 'linkedin.com/in/johndoe',
+    website: '',
+  },
+  summary: 'Passionate software developer with 5+ years of experience building scalable web applications. Proficient in React, Node.js, and Python. Led teams of 5+ developers and improved system performance by 40% through architectural improvements.',
+  experience: [
+    {
+      id: 1,
+      title: 'Senior Software Developer',
+      company: 'Tech Corp',
+      location: 'New York, NY',
+      startDate: 'Jan 2022',
+      endDate: 'Present',
+      current: true,
+      bullets: [
+        'Led development of microservices architecture serving 1M+ daily users',
+        'Mentored team of 5 junior developers, improving code quality by 30%',
+        'Implemented CI/CD pipelines reducing deployment time by 60%',
+      ],
+    },
+    {
+      id: 2,
+      title: 'Software Developer',
+      company: 'StartupXYZ',
+      location: 'San Francisco, CA',
+      startDate: 'Jun 2019',
+      endDate: 'Dec 2021',
+      current: false,
+      bullets: [
+        'Developed 10+ React components used across 3 products',
+        'Collaborated with design team to implement responsive UI',
+        'Reduced page load time by 45% through code optimization',
+      ],
+    },
+  ],
+  education: [
+    {
+      id: 1,
+      degree: 'Bachelor of Science in Computer Science',
+      school: 'University of Technology',
+      location: 'Boston, MA',
+      startDate: '2015',
+      endDate: '2019',
+      gpa: '3.8',
+      description: 'Graduated with honors. Relevant coursework: Data Structures, Algorithms, Web Development.',
+    },
+  ],
+  skills: [
+    { id: 1, category: 'Programming Languages', items: ['JavaScript', 'TypeScript', 'Python', 'SQL'] },
+    { id: 2, category: 'Frameworks', items: ['React', 'Node.js', 'Express', 'Next.js'] },
+    { id: 3, category: 'Tools', items: ['Git', 'Docker', 'AWS', 'CI/CD'] },
+  ],
+  projects: [
+    {
+      id: 1,
+      name: 'E-Commerce Platform',
+      description: 'Full-stack e-commerce solution with real-time inventory management',
+      technologies: ['React', 'Node.js', 'PostgreSQL', 'Redis'],
+      link: 'github.com/johndoe/ecommerce',
+    },
+  ],
+  certifications: [
+    { id: 1, name: 'AWS Certified Solutions Architect', issuer: 'Amazon Web Services', date: '2023' },
+  ],
+}
+
+function App() {
+  const [resumeData, setResumeData] = useState(function() {
+    try {
+      var saved = localStorage.getItem('resumeData')
+      if (saved) {
+        var parsed = JSON.parse(saved)
+        // Ensure all required arrays exist
+        return {
+          ...defaultResumeData,
+          ...parsed,
+          personal: { ...defaultResumeData.personal, ...(parsed.personal || {}) },
+          experience: parsed.experience || [],
+          education: parsed.education || [],
+          skills: parsed.skills || [],
+          projects: parsed.projects || [],
+          certifications: parsed.certifications || [],
+        }
+      }
+      return defaultResumeData
+    } catch (e) {
+      return defaultResumeData
+    }
+  })
+  const [template, setTemplate] = useState(function() {
+    try {
+      return localStorage.getItem('resumeTemplate') || 'modern'
+    } catch (e) {
+      return 'modern'
+    }
+  })
+  const [showPreview, setShowPreview] = useState(false)
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [showPayment, setShowPayment] = useState(false)
+  const [paymentMessage, setPaymentMessage] = useState(null)
+  const resumeRef = useRef(null)
+
+  useEffect(function() {
+    try {
+      localStorage.setItem('resumeData', JSON.stringify(resumeData))
+    } catch (e) {
+      console.error('Failed to save data:', e)
+    }
+  }, [resumeData])
+
+  useEffect(function() {
+    try {
+      localStorage.setItem('resumeTemplate', template)
+    } catch (e) {
+      console.error('Failed to save template:', e)
+    }
+  }, [template])
+
+  // Handle Stripe redirect
+  useEffect(function() {
+    const params = new URLSearchParams(window.location.search)
+    const sessionId = params.get('session_id')
+    const cancelled = params.get('cancelled')
+    
+    if (sessionId) {
+      // Clear URL params first, then process payment
+      window.history.replaceState({}, document.title, '/')
+      handlePaymentSuccess(sessionId)
+    }
+
+    if (cancelled) {
+      setPaymentMessage({ type: 'error', text: 'Payment was cancelled.' })
+      window.history.replaceState({}, document.title, '/')
+    }
+  }, [])
+
+  const handlePaymentSuccess = async (sessionId) => {
+    setIsGenerating(true)
+    setPaymentMessage(null)
+
+    try {
+      const response = await fetch('/api/generate-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          resumeData,
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to generate PDF')
+      }
+
+      // Get filename from Content-Disposition header or use default
+      const contentDisposition = response.headers.get('Content-Disposition')
+      let filename = `${resumeData.personal.name.replace(/\s+/g, '_')}_Resume.pdf`
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?(.+?)"?$/)
+        if (match) filename = match[1]
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      a.style.display = 'none'
+      document.body.appendChild(a)
+      a.click()
+      
+      // Cleanup after a short delay
+      setTimeout(() => {
+        document.body.removeChild(a)
+        window.URL.revokeObjectURL(url)
+      }, 100)
+      
+      setPaymentMessage({ type: 'success', text: 'PDF downloaded successfully!' })
+    } catch (error) {
+      console.error('Error:', error)
+      setPaymentMessage({ type: 'error', text: error.message || 'Error generating PDF' })
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const handleDownloadClick = () => {
+    setShowPayment(true)
+  }
+
+  const handleClearData = () => {
+    if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+      localStorage.removeItem('resumeData')
+      setResumeData(defaultResumeData)
+    }
+  }
+
+  const handleExportJSON = () => {
+    const blob = new Blob([JSON.stringify(resumeData, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${resumeData.personal.name.replace(/\s+/g, '_')}_Resume.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleImportJSON = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result)
+        setResumeData(data)
+      } catch {
+        alert('Invalid JSON file')
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  return (
+    <div className="app">
+      <header className="app-header">
+        <div className="header-content">
+          <div className="logo">
+            <span className="logo-icon">Resume</span>
+            <span className="logo-text">ProBuilder</span>
+          </div>
+          <div className="header-actions">
+            <button className="btn btn-outline" onClick={handleExportJSON}>
+              Export JSON
+            </button>
+            <label className="btn btn-outline">
+              Import JSON
+              <input type="file" accept=".json" onChange={handleImportJSON} hidden />
+            </label>
+            <button className="btn btn-outline" onClick={handleClearData}>
+              Reset
+            </button>
+            <button 
+              className="btn btn-primary" 
+              onClick={handleDownloadClick}
+              disabled={isGenerating}
+            >
+              {isGenerating ? 'Generating...' : 'Download PDF - €1'}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {paymentMessage && (
+        <div className={`payment-message ${paymentMessage.type}`}>
+          {paymentMessage.text}
+          <button onClick={() => setPaymentMessage(null)}>×</button>
+        </div>
+      )}
+
+      <div className="template-bar">
+        <span className="template-label">Template:</span>
+        <TemplateSelector
+          templates={TEMPLATES}
+          selected={template}
+          onSelect={setTemplate}
+        />
+        <button
+          className="btn btn-ghost mobile-preview-toggle"
+          onClick={() => setShowPreview(!showPreview)}
+        >
+          {showPreview ? 'Edit' : 'Preview'}
+        </button>
+      </div>
+
+      <main className="app-main">
+        <div className={`form-panel ${showPreview ? 'hide-mobile' : ''}`}>
+          <ResumeForm resumeData={resumeData} setResumeData={setResumeData} />
+        </div>
+        <div className={`preview-panel ${showPreview ? '' : 'hide-mobile'}`}>
+          <div className="preview-container">
+            <div ref={resumeRef} className="resume-print-area">
+              <ResumePreview resumeData={resumeData} template={template} />
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer className="app-footer">
+        <p>Need help? Contact us at <a href="mailto:stelios.galegalidis@gmail.com">stelios.galegalidis@gmail.com</a></p>
+      </footer>
+
+      {showPayment && (
+        <PaymentModal
+          onClose={() => setShowPayment(false)}
+          resumeName={resumeData.personal.name}
+        />
+      )}
+    </div>
+  )
+}
+
+export default App
