@@ -274,7 +274,7 @@ function generateDocxMinimal(resumeData, color, font) {
   )
 
   if (summary) {
-    children.push(sectionHeaderMinimal('About', 20, font))
+    children.push(sectionHeaderMinimal('Professional Summary', 20, font))
     children.push(new Paragraph({ children: [new TextRun({ text: summary, size: 18, color: '444444', font })], spacing: { after: 150 } }))
   }
 
@@ -373,12 +373,12 @@ function generateDocxExecutive(resumeData, color, font) {
   )
 
   if (summary) {
-    children.push(sectionHeaderExecutive('Executive Summary', 22, color, font))
+    children.push(sectionHeaderExecutive('Professional Summary', 22, color, font))
     children.push(new Paragraph({ children: [new TextRun({ text: summary, size: 20, font })], spacing: { after: 150 } }))
   }
 
   if (experience && experience.length > 0 && experience[0].title) {
-    children.push(sectionHeaderExecutive('Professional Experience', 22, color, font))
+    children.push(sectionHeaderExecutive('Work Experience', 22, color, font))
     addExperience(experience, children, 20, font, '▸', 720)
   }
 
@@ -388,7 +388,7 @@ function generateDocxExecutive(resumeData, color, font) {
   }
 
   if (skills && skills.length > 0 && skills[0].category) {
-    children.push(sectionHeaderExecutive('Core Competencies', 22, color, font))
+    children.push(sectionHeaderExecutive('Skills', 22, color, font))
     skills.forEach((skill) => {
       if (skill.category && skill.items && skill.items.length > 0) {
         children.push(new Paragraph({
@@ -511,6 +511,23 @@ function generateDocxCreative(resumeData, color, font) {
       }
     })
   }
+  if (certifications && certifications.length > 0 && certifications[0].name) {
+    mainChildren.push(new Paragraph({
+      children: [new TextRun({ text: 'CERTIFICATIONS', bold: true, size: 22, font })],
+      spacing: { before: 100, after: 80 },
+      border: { bottom: { color, style: BorderStyle.SINGLE, size: 1 } },
+    }))
+    certifications.forEach((cert) => {
+      mainChildren.push(new Paragraph({
+        children: [
+          new TextRun({ text: cert.name || '', bold: true, size: 18, font }),
+          new TextRun({ text: cert.issuer ? ` - ${cert.issuer}` : '', size: 16, font }),
+          new TextRun({ text: cert.date ? ` (${cert.date})` : '', size: 16, font }),
+        ],
+        spacing: { before: 60 },
+      }))
+    })
+  }
 
   // Two-column table: colored sidebar + white main
   const sidebarWidth = 2200
@@ -572,12 +589,12 @@ function generateDocxTechnical(resumeData, color, font) {
   )
 
   if (summary) {
-    children.push(sectionHeaderTechnical('Summary', 22, color, font))
+    children.push(sectionHeaderTechnical('Professional Summary', 22, color, font))
     children.push(new Paragraph({ children: [new TextRun({ text: summary, size: 20, font })], spacing: { after: 150 } }))
   }
 
   if (skills && skills.length > 0 && skills[0].category) {
-    children.push(sectionHeaderTechnical('Technical Skills', 22, color, font))
+    children.push(sectionHeaderTechnical('Skills', 22, color, font))
     skills.forEach((skill) => {
       if (skill.category && skill.items && skill.items.length > 0) {
         children.push(new Paragraph({
@@ -593,7 +610,7 @@ function generateDocxTechnical(resumeData, color, font) {
   }
 
   if (experience && experience.length > 0 && experience[0].title) {
-    children.push(sectionHeaderTechnical('Experience', 22, color, font))
+    children.push(sectionHeaderTechnical('Work Experience', 22, color, font))
     addExperience(experience, children, 20, font, '▸', 480)
   }
 
