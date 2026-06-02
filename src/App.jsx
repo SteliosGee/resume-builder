@@ -4,6 +4,9 @@ import ResumePreview from './components/ResumePreview'
 import TemplateSelector from './components/TemplateSelector'
 import PaymentModal from './components/PaymentModal'
 import FAQ from './components/FAQ'
+import ATSScore from './components/ATSScore'
+import SectionReorder from './components/SectionReorder'
+import CoverLetter from './components/CoverLetter'
 
 const TEMPLATES = [
   { id: 'modern', name: 'Modern', description: 'Clean design with accent colors' },
@@ -129,6 +132,7 @@ function App() {
   const [showPayment, setShowPayment] = useState(false)
   const [paymentMessage, setPaymentMessage] = useState(null)
   const [activeTab, setActiveTab] = useState('editor')
+  const [sectionOrder, setSectionOrder] = useState(['summary', 'experience', 'education', 'skills', 'projects', 'certifications'])
   const resumeRef = useRef(null)
 
   useEffect(function() {
@@ -307,6 +311,18 @@ function App() {
           Editor
         </button>
         <button
+          className={`tab-btn ${activeTab === 'cover' ? 'active' : ''}`}
+          onClick={() => setActiveTab('cover')}
+        >
+          Cover Letter
+        </button>
+        <button
+          className={`tab-btn ${activeTab === 'ats' ? 'active' : ''}`}
+          onClick={() => setActiveTab('ats')}
+        >
+          ATS Score
+        </button>
+        <button
           className={`tab-btn ${activeTab === 'faq' ? 'active' : ''}`}
           onClick={() => setActiveTab('faq')}
         >
@@ -343,16 +359,29 @@ function App() {
           <main className="app-main">
             <div className={`form-panel ${showPreview ? 'hide-mobile' : ''}`}>
               <ResumeForm resumeData={resumeData} setResumeData={setResumeData} />
+              <SectionReorder order={sectionOrder} setOrder={setSectionOrder} />
             </div>
             <div className={`preview-panel ${showPreview ? '' : 'hide-mobile'}`}>
               <div className="preview-container">
                 <div ref={resumeRef} className="resume-print-area">
-                  <ResumePreview resumeData={resumeData} template={template} accentColor={accentColor} />
+                  <ResumePreview resumeData={resumeData} template={template} accentColor={accentColor} sectionOrder={sectionOrder} />
                 </div>
               </div>
             </div>
           </main>
         </>
+      )}
+
+      {activeTab === 'cover' && (
+        <main className="app-main cover-mode">
+          <CoverLetter resumeData={resumeData} accentColor={accentColor} />
+        </main>
+      )}
+
+      {activeTab === 'ats' && (
+        <main className="app-main ats-mode">
+          <ATSScore resumeData={resumeData} />
+        </main>
       )}
 
       {activeTab === 'faq' && (
