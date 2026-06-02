@@ -653,8 +653,29 @@ export default async function handler(req, res) {
       addEducation(addSectionExecutive)
       addSkills(addSectionExecutive)
 
+    } else if (template === 'modern') {
+      // Modern: bold title with centered layout
+      pdf.setFont(font, 'bold')
+      pdf.setFontSize(32)
+      pdf.text(resumeData.personal.name || 'Your Name', pdfWidth / 2, y + 2, { align: 'center' })
+      y += 10
+      pdf.setFont(font, 'normal')
+      pdf.setFontSize(16)
+      pdf.setTextColor(rgb.r, rgb.g, rgb.b)
+      pdf.text(resumeData.personal.title || 'Your Title', pdfWidth / 2, y, { align: 'center' })
+      y += 7
+      pdf.setFontSize(10)
+      pdf.setTextColor(0, 0, 0)
+      pdf.text([resumeData.personal.email, resumeData.personal.phone, resumeData.personal.location, resumeData.personal.linkedin].filter(Boolean).join(' | '), pdfWidth / 2, y, { align: 'center' })
+      y += 10
+
+      addSummary(addSectionModern)
+      addExperience(addSectionModern)
+      addEducation(addSectionModern)
+      addSkills(addSectionModern)
+
     } else {
-      // Modern (default)
+      // Default: Modern (fallback)
       pdf.setFont(font, 'bold')
       pdf.setFontSize(32)
       pdf.text(resumeData.personal.name || 'Your Name', pdfWidth / 2, y + 2, { align: 'center' })
