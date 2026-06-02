@@ -112,6 +112,13 @@ function App() {
       return 'modern'
     }
   })
+  const [accentColor, setAccentColor] = useState(function() {
+    try {
+      return localStorage.getItem('resumeAccentColor') || '#2563eb'
+    } catch (e) {
+      return '#2563eb'
+    }
+  })
   const [showPreview, setShowPreview] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
   const [showPayment, setShowPayment] = useState(false)
@@ -133,6 +140,14 @@ function App() {
       console.error('Failed to save template:', e)
     }
   }, [template])
+
+  useEffect(function() {
+    try {
+      localStorage.setItem('resumeAccentColor', accentColor)
+    } catch (e) {
+      console.error('Failed to save color:', e)
+    }
+  }, [accentColor])
 
   // Handle Stripe redirect
   useEffect(function() {
@@ -163,6 +178,7 @@ function App() {
         body: JSON.stringify({
           sessionId,
           resumeData,
+          accentColor,
         }),
       })
 
@@ -173,7 +189,7 @@ function App() {
 
       // Get filename from Content-Disposition header or use default
       const contentDisposition = response.headers.get('Content-Disposition')
-      let filename = `${resumeData.personal.name.replace(/\s+/g, '_')}_Resume.pdf`
+      let filename = `${resumeData.personal.name.replace(/\s+/g, '_')}_Resume.zip`
       if (contentDisposition) {
         const match = contentDisposition.match(/filename="?(.+?)"?$/)
         if (match) filename = match[1]
@@ -194,7 +210,7 @@ function App() {
         window.URL.revokeObjectURL(url)
       }, 100)
       
-      setPaymentMessage({ type: 'success', text: 'PDF downloaded successfully!' })
+      setPaymentMessage({ type: 'success', text: 'PDF & DOCX downloaded successfully!' })
     } catch (error) {
       console.error('Error:', error)
       setPaymentMessage({ type: 'error', text: error.message || 'Error generating PDF' })
@@ -284,6 +300,15 @@ function App() {
           selected={template}
           onSelect={setTemplate}
         />
+        <div className="color-picker-group">
+          <label className="color-picker-label">Color:</label>
+          <input
+            type="color"
+            value={accentColor}
+            onChange={(e) => setAccentColor(e.target.value)}
+            className="color-picker"
+          />
+        </div>
         <button
           className="btn btn-ghost mobile-preview-toggle"
           onClick={() => setShowPreview(!showPreview)}
@@ -299,7 +324,7 @@ function App() {
         <div className={`preview-panel ${showPreview ? '' : 'hide-mobile'}`}>
           <div className="preview-container">
             <div ref={resumeRef} className="resume-print-area">
-              <ResumePreview resumeData={resumeData} template={template} />
+              <ResumePreview resumeData={resumeData} template={template} accentColor={accentColor} />
             </div>
           </div>
         </div>

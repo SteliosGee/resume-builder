@@ -127,8 +127,40 @@ body {
 
 .template-btn.active {
   background: var(--primary);
-  border-color: var(--primary);
   color: white;
+  border-color: var(--primary);
+}
+
+.color-picker-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
+.color-picker-label {
+  font-weight: 600;
+  color: var(--gray-600);
+  font-size: 0.875rem;
+}
+
+.color-picker {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 2px solid var(--gray-200);
+  border-radius: 6px;
+  cursor: pointer;
+  background: none;
+}
+
+.color-picker::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+
+.color-picker::-webkit-color-swatch {
+  border: none;
+  border-radius: 3px;
 }
 
 .mobile-preview-toggle {

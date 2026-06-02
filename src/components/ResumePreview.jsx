@@ -1,4 +1,4 @@
-function ResumePreview({ resumeData, template }) {
+function ResumePreview({ resumeData, template, accentColor }) {
   const { personal, summary, experience, education, skills, projects, certifications } = resumeData || {}
 
   const formatDate = (startDate, endDate, current) => {
@@ -7,13 +7,15 @@ function ResumePreview({ resumeData, template }) {
     return startDate || endDate || ''
   }
 
+  const color = accentColor || '#2563eb'
+
   if (template === 'modern') {
     return (
       <div className="resume modern">
         <header className="resume-header">
           <div className="header-main">
             <h1>{personal.name || 'Your Name'}</h1>
-            <p className="title">{personal.title || 'Your Title'}</p>
+            <p className="title" style={{ color }}>{personal.title || 'Your Title'}</p>
           </div>
           <div className="header-contact">
             {personal.email && <span>{personal.email}</span>}
@@ -26,14 +28,14 @@ function ResumePreview({ resumeData, template }) {
 
         {summary && (
           <section className="resume-section">
-            <h2>Professional Summary</h2>
+            <h2 style={{ color, borderColor: color }}>Professional Summary</h2>
             <p className="summary-text">{summary}</p>
           </section>
         )}
 
         {experience && experience.length > 0 && experience[0].title && (
           <section className="resume-section">
-            <h2>Work Experience</h2>
+            <h2 style={{ color, borderColor: color }}>Work Experience</h2>
             {experience.map((exp) => (
               <div key={exp.id} className="experience-entry">
                 <div className="entry-header">
@@ -60,7 +62,7 @@ function ResumePreview({ resumeData, template }) {
 
         {education && education.length > 0 && education[0].degree && (
           <section className="resume-section">
-            <h2>Education</h2>
+            <h2 style={{ color, borderColor: color }}>Education</h2>
             {education.map((edu) => (
               <div key={edu.id} className="education-entry">
                 <div className="entry-header">
@@ -81,11 +83,11 @@ function ResumePreview({ resumeData, template }) {
 
         {skills && skills.length > 0 && skills[0].category && (
           <section className="resume-section">
-            <h2>Skills</h2>
+            <h2 style={{ color, borderColor: color }}>Skills</h2>
             <div className="skills-grid">
               {skills.map((skill) => (
                 <div key={skill.id} className="skill-group">
-                  <span className="skill-category">{skill.category}:</span>
+                  <span className="skill-category" style={{ color }}>{skill.category}:</span>
                   <span className="skill-items">{skill.items.join(', ')}</span>
                 </div>
               ))}
@@ -95,7 +97,7 @@ function ResumePreview({ resumeData, template }) {
 
         {projects && projects.length > 0 && projects[0].name && (
           <section className="resume-section">
-            <h2>Projects</h2>
+            <h2 style={{ color, borderColor: color }}>Projects</h2>
             {projects.map((project) => (
               <div key={project.id} className="project-entry">
                 <div className="entry-header">
@@ -103,10 +105,10 @@ function ResumePreview({ resumeData, template }) {
                   {project.link && <span className="link">{project.link}</span>}
                 </div>
                 {project.description && <p className="description">{project.description}</p>}
-                {project.technologies.length > 0 && (
+                {project.technologies && project.technologies.length > 0 && (
                   <div className="tech-tags">
                     {project.technologies.map((tech, i) => (
-                      <span key={i} className="tech-tag">{tech}</span>
+                      <span key={i} className="tech-tag" style={{ borderColor: color, color }}>{tech}</span>
                     ))}
                   </div>
                 )}
@@ -117,7 +119,7 @@ function ResumePreview({ resumeData, template }) {
 
         {certifications && certifications.length > 0 && certifications[0].name && (
           <section className="resume-section">
-            <h2>Certifications</h2>
+            <h2 style={{ color, borderColor: color }}>Certifications</h2>
             {certifications.map((cert) => (
               <div key={cert.id} className="certification-entry">
                 <div className="entry-header">
@@ -149,14 +151,14 @@ function ResumePreview({ resumeData, template }) {
 
         {summary && (
           <section className="resume-section">
-            <h2>PROFESSIONAL SUMMARY</h2>
+            <h2 style={{ color, borderColor: color }}>PROFESSIONAL SUMMARY</h2>
             <p>{summary}</p>
           </section>
         )}
 
         {experience && experience.length > 0 && experience[0].title && (
           <section className="resume-section">
-            <h2>WORK EXPERIENCE</h2>
+            <h2 style={{ color, borderColor: color }}>WORK EXPERIENCE</h2>
             {experience.map((exp) => (
               <div key={exp.id} className="experience-entry">
                 <div className="entry-row">
@@ -180,7 +182,7 @@ function ResumePreview({ resumeData, template }) {
 
         {education && education.length > 0 && education[0].degree && (
           <section className="resume-section">
-            <h2>EDUCATION</h2>
+            <h2 style={{ color, borderColor: color }}>EDUCATION</h2>
             {education.map((edu) => (
               <div key={edu.id} className="education-entry">
                 <div className="entry-row">
@@ -199,11 +201,11 @@ function ResumePreview({ resumeData, template }) {
 
         {skills && skills.length > 0 && skills[0].category && (
           <section className="resume-section">
-            <h2>SKILLS</h2>
+            <h2 style={{ color, borderColor: color }}>SKILLS</h2>
             <div className="skills-list">
               {skills.map((skill, i) => (
                 <div key={skill.id}>
-                  <strong>{skill.category}:</strong> {skill.items.join(', ')}
+                  <strong style={{ color }}>{skill.category}:</strong> {skill.items.join(', ')}
                   {i < skills.length - 1 && <span className="separator"> | </span>}
                 </div>
               ))}
@@ -213,7 +215,7 @@ function ResumePreview({ resumeData, template }) {
 
         {projects && projects.length > 0 && projects[0].name && (
           <section className="resume-section">
-            <h2>PROJECTS</h2>
+            <h2 style={{ color, borderColor: color }}>PROJECTS</h2>
             {projects.map((project) => (
               <div key={project.id} className="project-entry">
                 <div className="entry-row">
@@ -261,7 +263,7 @@ function ResumePreview({ resumeData, template }) {
       </header>
 
       {personal.title && (
-        <div className="title-line">{personal.title}</div>
+        <div className="title-line" style={{ borderBottomColor: color }}>{personal.title}</div>
       )}
 
       {summary && (
@@ -272,7 +274,7 @@ function ResumePreview({ resumeData, template }) {
 
       {experience && experience.length > 0 && experience[0].title && (
         <section className="resume-section">
-          <h2>EXPERIENCE</h2>
+          <h2 style={{ color }}>EXPERIENCE</h2>
           {experience.map((exp) => (
             <div key={exp.id} className="experience-entry">
               <div className="entry-header">
@@ -296,7 +298,7 @@ function ResumePreview({ resumeData, template }) {
 
       {education && education.length > 0 && education[0].degree && (
         <section className="resume-section">
-          <h2>EDUCATION</h2>
+          <h2 style={{ color }}>EDUCATION</h2>
           {education.map((edu) => (
             <div key={edu.id} className="education-entry">
               <div className="entry-header">
@@ -314,11 +316,11 @@ function ResumePreview({ resumeData, template }) {
 
       {skills && skills.length > 0 && skills[0].category && (
         <section className="resume-section">
-          <h2>SKILLS</h2>
+          <h2 style={{ color }}>SKILLS</h2>
           <div className="skills-compact">
             {skills.map((skill, i) => (
               <span key={skill.id}>
-                <strong>{skill.category}:</strong> {skill.items.join(', ')}
+                <strong style={{ color }}>{skill.category}:</strong> {skill.items.join(', ')}
                 {i < skills.length - 1 && ' • '}
               </span>
             ))}
