@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import ResumeForm from './components/ResumeForm'
 import ResumePreview from './components/ResumePreview'
 import TemplateSelector from './components/TemplateSelector'
@@ -460,6 +461,7 @@ function App() {
   return (
     <ToastProvider>
       <AppContent />
+      <Analytics />
     </ToastProvider>
   )
 }
